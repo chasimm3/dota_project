@@ -234,23 +234,22 @@ class OpenDota():
     def transform_players(self):
         
         players_file_path = self.staging_folder + 'pro_players/'
+        output_file = self.tables_folder + 'players.csv'
         
         list_of_files = glob.glob(players_file_path + '*') # * means all if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
         print(latest_file)
-        
-        
+           
         # open the file
         with open(latest_file, "r") as json_file:
             player_data = json.load(json_file)
 
-        # not currently used but handy to have
-        #df_columns = ('account_id', 'steamid', 'personaname', 'last_login', 'full_history_time', 'loccountrycode', 'last_match_time', 'name', 'fantasy_role', 'team_name', 'team_tag', 'is_pro')
-        
         # initialise dataframe of player data in the staging file
         df = pd.json_normalize(player_data)
         
-        print(df)
+        # save dataframe to csv file
+        df.to_csv(output_file, index=False)
+
         
     def transform_matches(self):
         

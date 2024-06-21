@@ -292,6 +292,7 @@ pathlib.Path(staging_folder + 'pro_players/').mkdir(parents=True, exist_ok=True)
 pathlib.Path(staging_folder + 'recent_matches/').mkdir(parents=True, exist_ok=True)
 pathlib.Path(delta_folder).mkdir(parents=True, exist_ok=True)
 pathlib.Path(data_folder).mkdir(parents=True, exist_ok=True)
+pathlib.Path(tables_folder).mkdir(parents=True, exist_ok=True)
 
 
 

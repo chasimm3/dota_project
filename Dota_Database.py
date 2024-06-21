@@ -9,7 +9,7 @@ import os
 import time
 import pathlib
 
-#test test
+
 class Dota2Players():
     def __init__(self, base_url, date1, data_folder, delta_folder, file_prefix):
         self.base_url = base_url
@@ -232,77 +232,87 @@ class OpenDota():
         
     def transform_matches(self):
         
+        players_file_path = self.staging_folder + 'pro_players/'
+        
+        print(players_file_path)
+        
         # open the file
-        with open(self.players_file_path, "r") as json_file:
-            data = json.load(json_file)
-            
-        # initialise dataframe
-        df_columns = ('player_name', 'account_id', 'team_name', 'last_match_time')
-        self.df_players = pd.DataFrame(columns=(df_columns))
+        with open(players_file_path, "r") as json_file:
+            player_data = json.load(json_file)
+
+        # initialise dataframe of player data in the staging file
+        df_columns = ('account_id', 'steamid', 'personaname', 'last_login', 'full_history_time', 'loccountrycode', 'last_match_time', 'name', 'fantasy_role', 'team_name', 'team_tag', 'is_pro')
+        df = pd.json_normalize(player_data)
+        
+        print(df)
+        
+        # # initialise dataframe
+        # df_columns = ('player_name', 'account_id', 'team_name', 'last_match_time')
+        # self.df_players = pd.DataFrame(columns=(df_columns))
     
-        i = 0
-        # for each item in json array, get player name, player steam id 
-        # and player team and append them to the dataframe
-        for item in data:
-            if not (item['name'] is None):
-                player_name = item['name']
-            else:
-                player_name = ''
-            if not (item['account_id'] is None):
-                account_id = str(item['account_id'])
-            else:
-                account_id = ''
-            if not (item['team_name'] is None):
-                team_name = item['team_name']
-            else:
-                team_name = ''
-            if not (item['last_match_time'] is None):
-                last_match_time_str = str(item['last_match_time'])
-            else:
-                last_match_time_str = ''
+        # i = 0
+        # # for each item in json array, get player name, player steam id 
+        # # and player team and append them to the dataframe
+        # for item in data:
+        #     if not (item['name'] is None):
+        #         player_name = item['name']
+        #     else:
+        #         player_name = ''
+        #     if not (item['account_id'] is None):
+        #         account_id = str(item['account_id'])
+        #     else:
+        #         account_id = ''
+        #     if not (item['team_name'] is None):
+        #         team_name = item['team_name']
+        #     else:
+        #         team_name = ''
+        #     if not (item['last_match_time'] is None):
+        #         last_match_time_str = str(item['last_match_time'])
+        #     else:
+        #         last_match_time_str = ''
                 
-            new_row = pd.Series({'player_name':player_name, 'account_id':account_id, 'team_name':team_name, 'last_match_time':last_match_time_str})
+        #     new_row = pd.Series({'player_name':player_name, 'account_id':account_id, 'team_name':team_name, 'last_match_time':last_match_time_str})
                         
             
-            #print(type(item['last_match_time']))
-            if not (item['last_match_time'] is None and type(last_match_time_str != None)):
-                last_match_time = parser.parse(last_match_time_str)
-                current_date = datetime.now(last_match_time.tzinfo)                        
+        #     #print(type(item['last_match_time']))
+        #     if not (item['last_match_time'] is None and type(last_match_time_str != None)):
+        #         last_match_time = parser.parse(last_match_time_str)
+        #         current_date = datetime.now(last_match_time.tzinfo)                        
                 
-                date_difference = current_date - last_match_time
-                if (date_difference < timedelta(hours=5)):# and player_name == 'SaberLight':
-                    recent_matches_url = self.base_url + 'players/' + str(account_id) + '/recentMatches/'          
-                    print(str(i) + ' - Player: ' + str(account_id) + ' last played on :' + last_match_time_str )         
-                    i +=1
+        #         date_difference = current_date - last_match_time
+        #         if (date_difference < timedelta(hours=5)):# and player_name == 'SaberLight':
+        #             recent_matches_url = self.base_url + 'players/' + str(account_id) + '/recentMatches/'          
+        #             print(str(i) + ' - Player: ' + str(account_id) + ' last played on :' + last_match_time_str )         
+        #             i +=1
                     
-                    # self.matches = requests.get(recent_matches_url).json()
+        #             # self.matches = requests.get(recent_matches_url).json()
 
-                    # with open(self.data_folder + self.output_file, "a") as f:
-                    #     json.dump(self.matches, f, ensure_ascii=False, indent=4)
+        #             # with open(self.data_folder + self.output_file, "a") as f:
+        #             #     json.dump(self.matches, f, ensure_ascii=False, indent=4)
                     
-                    # time.sleep(1)
+        #             # time.sleep(1)
             
-            # append new row to end of dataframe
-            self.df_players.loc[len(self.df_players)] = new_row
-        # sorted by last_match_time
-        self.df_players = self.df_players.sort_values('last_match_time')
-        self.df_players = self.df_players.reset_index(drop=True)
-        # load to csv
-        self.df_players.to_csv(self.data_folder + 'pro_players.csv')
+        #     # append new row to end of dataframe
+        #     self.df_players.loc[len(self.df_players)] = new_row
+        # # sorted by last_match_time
+        # self.df_players = self.df_players.sort_values('last_match_time')
+        # self.df_players = self.df_players.reset_index(drop=True)
+        # # load to csv
+        # self.df_players.to_csv(self.data_folder + 'pro_players.csv')
         
         
-        for index, row in self.df_players.iterrows():
-            if row['player_name'] == 'Newsham':
-                recent_matches_url = self.base_url + 'players/' + str(row['account_id']) + '/recentMatches/'              
-                print(recent_matches_url)
+        # for index, row in self.df_players.iterrows():
+        #     if row['player_name'] == 'Newsham':
+        #         recent_matches_url = self.base_url + 'players/' + str(row['account_id']) + '/recentMatches/'              
+        #         print(recent_matches_url)
             
 
           
           
-
-data_folder = 'Data/'
-delta_folder ='Delta/'
-staging_folder = 'Staging/'
+base_file_path = 'D:/General Storage/Python/Liquipedia Data Grab/'
+data_folder = base_file_path + 'Data/'
+delta_folder = base_file_path + 'Delta/'
+staging_folder = base_file_path + 'Staging/'
 base_url = 'https://liquipedia.net/dota2/'
 # get today's date
 date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
@@ -314,10 +324,13 @@ pathlib.Path(staging_folder + 'recent_matches/').mkdir(parents=True, exist_ok=Tr
 pathlib.Path(delta_folder).mkdir(parents=True, exist_ok=True)
 pathlib.Path(data_folder).mkdir(parents=True, exist_ok=True)
 
+
+
 open_dota = OpenDota(data_folder, delta_folder, staging_folder, date1)
 
-open_dota.load_players()
-open_dota.load_matches()
+# open_dota.load_players()
+# open_dota.load_matches()
+open_dota.transform_matches()
 
 # Initialise Data Manipulation class
 data_man = DataManipulation(data_folder, delta_folder)

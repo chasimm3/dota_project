@@ -9,6 +9,7 @@ import os
 import time
 import pathlib
 
+#test test
 class Dota2Players():
     def __init__(self, base_url, date1, data_folder, delta_folder, file_prefix):
         self.base_url = base_url

@@ -1,0 +1,44 @@
+Notes:
+
+To Do: 
+
+1. Pull latest matches for pros and load into individual json files stored in staging
+2. Pull key data from matches json and load into csv/dataframe
+3. build dimensional model based on matches fact table, and player/team dimensions
+
+
+Issues:
+
+
+
+Old code: 
+
+        # for item in data:
+        #     if not (item['account_id'] is None):
+        #         account_id = str(item['account_id'])
+        #     else:
+        #         account_id = ''    
+        #     if not (item['last_match_time'] is None):
+        #         last_match_time_str = str(item['last_match_time'])
+        #     else:
+        #         last_match_time_str = ''    
+    
+        #     #print(type(item['last_match_time']))
+        #     if not (item['last_match_time'] is None and type(last_match_time_str != None)):
+        #         last_match_time = parser.parse(last_match_time_str)
+        #         current_date = datetime.now(last_match_time.tzinfo)                        
+                
+        #         # calculate date difference between last match and now, if less than 5 hours ago, build the api url
+        #         date_difference = current_date - last_match_time
+        #         if (date_difference < timedelta(hours=5)):# and player_name == 'SaberLight':
+        #             recent_matches_url = self.base_url + 'players/' + str(account_id) + '/recentMatches/'          
+        #             print(str(i) + ' - Player: ' + str(account_id) + ' last played on :' + last_match_time_str )         
+        #             i +=1    
+                
+                
+        #             self.matches = requests.get(recent_matches_url).json()
+
+        #             with open(self.data_folder + self.output_file + account_id + '.json', "w") as f:
+        #                 json.dump(self.matches, f, ensure_ascii=False, indent=4)
+                    
+        #         time.sleep(1)

@@ -8,6 +8,7 @@ import glob
 import os
 import time
 import pathlib
+from support import make_api_request
 
 
 class Dota2Players():
@@ -68,8 +69,7 @@ class Dota2Players():
         print('Data has been scraped and saved to ' + output_file)
         
         return self.df_new
-
-        
+      
 class Dota2Teams():
     def __init__(self):
         # URL of the page to scrape
@@ -112,8 +112,7 @@ class Dota2Teams():
                             file_content = team_name['title'] + ',' + region_name['id'] + ',' + team_status + '\n'
                             with open(output_file, "a") as f:
                                 f.write(file_content)
-                                
-                                
+                                                               
 class DataManipulation():
     def __init__(self, data_folder, delta_folder):
         self.data_folder = data_folder
@@ -220,16 +219,6 @@ class OpenDota():
                     with open(output_folder + str(account_id) + '.json', "w") as f:
                         json.dump(self.matches, f, ensure_ascii=False, indent=4)            
                     time.sleep(1)         
-                
-            
-    def make_api_request(self, url):
-        try:
-            response = requests.get(url)
-            response.raise_for_status() # Raise an error for bad status code
-            return response.json()
-        except requests.RequestException as e:
-            return {'error': str(e)}
-
         
     def transform_players(self):
         
@@ -273,8 +262,7 @@ class OpenDota():
         df.to_csv(output_file, index=False)
         
         print('Match Transformation Complete: ' + output_file + ' created.')
-            
-          
+                   
           
 base_file_path = 'D:/General Storage/Python/Liquipedia Data Grab/dota_project/'
 data_folder = base_file_path + 'Data/'
@@ -282,9 +270,11 @@ delta_folder = base_file_path + 'Delta/'
 staging_folder = base_file_path + 'Staging/'
 tables_folder = base_file_path + 'Tables/'
 base_url = 'https://liquipedia.net/dota2/'
+player_file_prefix = 'players_sorted_by_country'
+
 # get today's date
 date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
-player_file_prefix = 'players_sorted_by_country'
+
 
 # create folders if they don't exist
 pathlib.Path(staging_folder + 'pro_players/').mkdir(parents=True, exist_ok=True)

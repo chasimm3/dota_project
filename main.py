@@ -8,6 +8,7 @@ import os
 import time
 import pathlib
 from support import make_api_request, get_value_by_column, DataManipulation
+from collections import defaultdict
 
 
 class OpenDota():
@@ -81,42 +82,70 @@ class OpenDota():
         
     def transform_players(self):
         
-        players_file_path = self.staging_folder + 'pro_players/'
-        output_file = self.tables_folder + 'players.csv'
+        staging_file_path = self.staging_folder + 'pro_players/'
+        output_file = self.tables_folder + 'dim_players.csv'
         
-        list_of_files = glob.glob(players_file_path + '*') # * means all if need specific format then *.csv
+        list_of_files = glob.glob(staging_file_path + '*') # * means all, if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
         print(latest_file)
            
-        # open the file
+        
+        # open existing dimension and store in dataframea
+        df_old = pd.read_csv(output_file, dtype=str, keep_default_na=False)
+         
+        # df_old = pd.read_csv(output_file)   
+        
+        # open the source file
         with open(latest_file, "r") as json_file:
             player_data = json.load(json_file)
 
         # initialise dataframe of player data in the staging file
         df = pd.json_normalize(player_data)
         
+        
         # add effective to date column on the end
         current_date = datetime.now()
         df['effective_from_date'] = pd.Timestamp(current_date)
+        df['effective_to_date'] = pd.Timestamp('3000-12-31')
+        
+        
+        df_old = df_old[df_old.columns.difference(['effective_from_date', 'effective_to_date', 'dim_player_id'], sort=False)]
+        
+        # store new records in a dataframe
+        df_new = pd.DataFrame().reindex_like(df_old)
+        # df_new = df[df.columns.difference(['effective_from_date', 'effective_to_date'], sort=False)]
+        
+        df_new = pd.concat([df_new, df])
+        
+        
+        df_old = df_old.convert_dtypes()
+        
+        print(df_new['steamid'])
+        print(type(df_new['steamid']))
+        print(df_old['steamid'])
+        print(type(df_old['steamid']))
+        
+        #DataManipulation(self.tables_folder + 'dim_players.csv', self.tables_folder + '/delta/').compare_data('dim_players', df_old, df_new, str(current_date))
         
         # insert incremental integer in column 1 
         df.insert(0, 'dim_player_id', range(1, 1 + len(df)))
         
         # save dataframe to csv file
         df.to_csv(output_file, index=False)
-
+        
+        print('Player Transformation Complete: ' + output_file + ' created.')
         
     def transform_matches(self):
         
         matches_file_path = self.staging_folder + 'recent_matches/'
-        output_file = self.tables_folder + 'recent_matches.csv'
+        output_file = self.tables_folder + 'fact_matches.csv'
         
         list_of_files = glob.glob(matches_file_path + '*')      
         
         df = pd.DataFrame()
         
         # load players csv file to dataframe            
-        players_file = self.tables_folder + 'players.csv'
+        players_file = self.tables_folder + 'dim_players.csv'
         df_players = pd.DataFrame()
         df_players = pd.read_csv(players_file, header='infer')
         
@@ -181,6 +210,6 @@ open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, d
 
 # open_dota.load_players()
 # open_dota.load_matches() # takes fucking ages
-# open_dota.transform_players() 
+open_dota.transform_players() 
 open_dota.transform_matches()
 

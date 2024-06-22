@@ -6,9 +6,10 @@ To Do:
 2. Pull key data from matches json and load into csv/dataframe - done
 3. build dimensional model based on matches fact table, and player/team dimensions
         currently building match fact using a join to players.csv, need to build dataframe of players.csv and make the account_id the key column, 
-        can then join from the match dataframe to the player dataframe on account_id
-
+        can then join from the match dataframe to the player dataframe on account_id - done
         need to add account_id as a column in matches file. - done 
+4. Build team dimension, decide how team dimension will work and where it will sit. It's probably a heirarchical dimension containing org>team>player
+5. join it up and have fun :D :D :D
 
 Issues:
 

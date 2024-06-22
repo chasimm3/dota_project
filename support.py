@@ -1,4 +1,7 @@
 import requests
+import glob
+import os
+import pandas as pd
 
 def make_api_request(self, url):
     try:
@@ -20,3 +23,42 @@ def get_value_by_column(df, column_name, match_value, return_column):
         return filtered_df[return_column].values[0]
     else:
         return None
+
+
+class DataManipulation():
+    def __init__(self, data_folder, delta_folder):
+        self.data_folder = data_folder
+        self.delta_folder = delta_folder
+    
+    def get_last_run(self, file_prefix):
+        
+        self.file_prefix = file_prefix
+        
+        # search for files in the folder which contain the prefix
+        search_pattern = os.path.join(self.data_folder, self.file_prefix + '*')
+        list_of_files = glob.glob(search_pattern)
+        
+        # get latest file based on created date
+        self.latest_file = max(list_of_files, key=os.path.getctime)
+        
+        # create a data frame of the latest file
+        self.df_last = pd.read_csv(self.latest_file)
+        
+    def compare_data(self, file_prefix, df_old, df_new, date):
+        
+        self.file_prefix = file_prefix
+        self.df_new = df_new
+        self.date = date
+        
+        # initiate delta file name
+        self.delta_file = self.delta_folder + self.file_prefix + '_deltas_' + self.date + '.csv'
+        
+        # get different values between dataframes
+        df_comp = pd.merge(df_old, self.df_new, how='outer', indicator='Change Type')
+        df_comp = df_comp.loc[df_comp['Change Type'] != 'both']    
+        
+        # change the text of the indicator column "Change Type" to New or Deleted
+        df_comp['Change Type'] = df_comp['Change Type'].str.replace('left_only', 'Deleted').str.replace('right_only', 'New')
+        
+        # output the delta to the delta folder
+        df_comp.to_csv(self.delta_file, index=False)    

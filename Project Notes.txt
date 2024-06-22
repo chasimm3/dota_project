@@ -2,13 +2,29 @@ Notes:
 
 To Do: 
 
-1. Pull latest matches for pros and load into individual json files stored in staging
-2. Pull key data from matches json and load into csv/dataframe
+1. Pull latest matches for pros and load into individual json files stored in staging - done
+2. Pull key data from matches json and load into csv/dataframe - done
 3. build dimensional model based on matches fact table, and player/team dimensions
+        currently building match fact using a join to players.csv, need to build dataframe of players.csv and make the account_id the key column, 
+        can then join from the match dataframe to the player dataframe on account_id
 
+        need to add account_id as a column in matches file. - done 
 
 Issues:
 
+Dataframe example:
+
+df1
+        match_id        account_id
+0       1               dfg
+1       2               cba
+2       3               abc
+
+df2
+        dim_player_id   account_id
+0       1               dfg
+1       2               abc
+2       3               cba
 
 
 Old code: 

@@ -8,7 +8,7 @@ import glob
 import os
 import time
 import pathlib
-from support import make_api_request
+from support import make_api_request, get_value_by_column
 
 
 class Dota2Players():
@@ -236,6 +236,13 @@ class OpenDota():
         # initialise dataframe of player data in the staging file
         df = pd.json_normalize(player_data)
         
+        # add effective to date column on the end
+        current_date = datetime.now()
+        df['effective_from_date'] = pd.Timestamp(current_date)
+        
+        # insert incremental integer in column 1 
+        df.insert(0, 'dim_player_id', range(1, 1 + len(df)))
+        
         # save dataframe to csv file
         df.to_csv(output_file, index=False)
 
@@ -249,6 +256,11 @@ class OpenDota():
         
         df = pd.DataFrame()
         
+        # load players csv file to dataframe            
+        players_file = self.tables_folder + 'players.csv'
+        df_players = pd.DataFrame()
+        df_players = pd.read_csv(players_file, header='infer')
+        
         # loop through json files in staging folder
         for i in list_of_files:
             with open(i, "r") as json_file:
@@ -256,15 +268,36 @@ class OpenDota():
                 
                 # append json array items to dataframe
                 df2 = pd.json_normalize(match_data)
+                
+                # get account_id from the file name and add it as an additional columns
+
+                # -> reverse the path 
+                # -> within the reverse of the path find the location of the first _ 
+                # -> take everything to the left of the first underscore 
+                # -> reverse it back
+                # -> replace .json with nothing
+                
+                u = (((i[::-1])[:((i[::-1]).find('_'))])[::-1]).replace('.json', '')
+                
+                df2['account_id'] = u
+                
+                # get the dim_player_id for the account id
+                df2['dim_player_id'] = get_value_by_column(df_players, 'account_id', int(u), 'dim_player_id')
+                
                 df = pd.concat([df2, df])
+
+        current_date = datetime.now()
+        df['effective_from_date'] = pd.Timestamp(current_date)
         
         # save dataframe to csv file
         df.to_csv(output_file, index=False)
         
         print('Match Transformation Complete: ' + output_file + ' created.')
-                   
+        
+        
+    
           
-base_file_path = 'D:/General Storage/Python/Liquipedia Data Grab/dota_project/'
+base_file_path = 'C:/Work/Python/Dota/dota_project/'
 data_folder = base_file_path + 'Data/'
 delta_folder = base_file_path + 'Delta/'
 staging_folder = base_file_path + 'Staging/'
@@ -287,9 +320,9 @@ pathlib.Path(tables_folder).mkdir(parents=True, exist_ok=True)
 
 open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, date1)
 
-open_dota.load_players()
-# open_dota.load_matches()
-# open_dota.transform_players()
+# open_dota.load_players()
+# open_dota.load_matches() # takes fucking ages
+# open_dota.transform_players() 
 open_dota.transform_matches()
 
 

@@ -51,7 +51,12 @@ class DataManipulation():
         self.date = date
         
         # initiate delta file name
-        self.delta_file = self.delta_folder + self.file_prefix + '_deltas_' + self.date + '.csv'
+        if date is not None:
+            self.delta_file = self.delta_folder + self.file_prefix + '_deltas_' + self.date + '.csv'
+        else:
+            self.delta_file = self.delta_folder + self.file_prefix + '_deltas.csv'
+        
+        print(self.delta_file)
         
         # get different values between dataframes
         df_comp = pd.merge(df_old, self.df_new, how='outer', indicator='Change Type')
@@ -61,4 +66,5 @@ class DataManipulation():
         df_comp['Change Type'] = df_comp['Change Type'].str.replace('left_only', 'Deleted').str.replace('right_only', 'New')
         
         # output the delta to the delta folder
-        df_comp.to_csv(self.delta_file, index=False)    
+        df_comp.to_csv(self.delta_file, index=False, mode='w')    
+        

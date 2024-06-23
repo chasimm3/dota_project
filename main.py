@@ -7,6 +7,7 @@ import glob
 import os
 import time
 import pathlib
+import numpy as np
 from support import make_api_request, get_value_by_column, DataManipulation
 from collections import defaultdict
 
@@ -84,6 +85,8 @@ class OpenDota():
         
         staging_file_path = self.staging_folder + 'pro_players/'
         output_file = self.tables_folder + 'dim_players.csv'
+        working_file = self.delta_folder + 'dim_players_working_file.csv'
+        delta_file = self.delta_folder + 'dim_players_deltas.csv'
         
         list_of_files = glob.glob(staging_file_path + '*') # * means all, if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
@@ -92,8 +95,9 @@ class OpenDota():
         
         # open existing dimension and store in dataframea
         df_old = pd.read_csv(output_file, dtype=str, keep_default_na=False)
-         
-        # df_old = pd.read_csv(output_file)   
+        
+        df_old_comp = df_old[df_old.columns.difference(['effective_from_date', 'effective_to_date', 'dim_player_id'], sort=False)]
+        
         
         # open the source file
         with open(latest_file, "r") as json_file:
@@ -103,37 +107,47 @@ class OpenDota():
         df = pd.json_normalize(player_data)
         
         
-        # add effective to date column on the end
+        # # add effective to date column on the end
         current_date = datetime.now()
-        df['effective_from_date'] = pd.Timestamp(current_date)
-        df['effective_to_date'] = pd.Timestamp('3000-12-31')
-        
-        
-        df_old = df_old[df_old.columns.difference(['effective_from_date', 'effective_to_date', 'dim_player_id'], sort=False)]
-        
-        # store new records in a dataframe
-        df_new = pd.DataFrame().reindex_like(df_old)
-        # df_new = df[df.columns.difference(['effective_from_date', 'effective_to_date'], sort=False)]
-        
-        df_new = pd.concat([df_new, df])
-        
-        
-        df_old = df_old.convert_dtypes()
-        
-        print(df_new['steamid'])
-        print(type(df_new['steamid']))
-        print(df_old['steamid'])
-        print(type(df_old['steamid']))
-        
-        #DataManipulation(self.tables_folder + 'dim_players.csv', self.tables_folder + '/delta/').compare_data('dim_players', df_old, df_new, str(current_date))
-        
-        # insert incremental integer in column 1 
-        df.insert(0, 'dim_player_id', range(1, 1 + len(df)))
         
         # save dataframe to csv file
-        df.to_csv(output_file, index=False)
+        df.to_csv(working_file, index=False)
         
         print('Player Transformation Complete: ' + output_file + ' created.')
+        
+        # read the working file as the new dataframe, converting data to strings for comparison with the old file
+        df_new = pd.read_csv(working_file, dtype=str, keep_default_na=False)
+        
+        # initiate data manipulation class then run compare_data against the old dataframe and new dataframe, output to dim_players.csv
+        comp_files = DataManipulation(self.tables_folder + 'dim_players.csv', self.delta_folder)
+        comp_files.compare_data('dim_players', df_old_comp, df_new, date=None)
+        
+        # read delta file into csv
+        comp_files = pd.read_csv(delta_file, dtype=str, keep_default_na=False)
+        
+        # merge old and comp files based on account_id
+        df_old = df_old.merge(comp_files, on='account_id', how='left', suffixes=('', '_tempCol'))
+        
+        # set effective from date, to date and dim_player_id for new and deleted (updated) records
+        df_old['effective_from_date'] = np.where(df_old['Change Type'] == "New", pd.Timestamp(current_date), df_old['effective_from_date'])
+        df_old['effective_to_date'] = np.where(df_old['Change Type'] == "Deleted", pd.Timestamp(current_date), df_old['effective_to_date'])
+        df_old['dim_player_id'] = np.where(df_old['Change Type'] == "New", str(len(df_old.index)),  df_old['dim_player_id']).astype(int)
+        
+        # drop all _tempCols that were generated in the merge
+        df = df_old[df_old.columns.drop(list(df_old.filter(regex='_tempCol')))]
+        # drop Change Type column
+        df = df.drop(columns=['Change Type'])
+        
+        # sort dataframe by dim_player_id then reset the index
+        df = df.sort_values(by=['dim_player_id']).reset_index(drop=True)
+        
+        print(df)
+        
+        # load to csv, not including the index (I know I just reset it, it was for testing purposes)
+        df.to_csv(self.tables_folder + 'dim_players_test.csv', index=False)
+        
+        
+        
         
     def transform_matches(self):
         

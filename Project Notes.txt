@@ -11,6 +11,9 @@ To Do:
 4. Build team dimension, decide how team dimension will work and where it will sit. It's probably a heirarchical dimension containing org>team>player
 5. join it up and have fun :D :D :D
 
+6. Trying to build the Type 2 dimension effective_from and _to date stuff. Currently trying to merge the old and new data then use the 
+        data from the new to update the old and set the effective_from_dates. 
+
 Issues:
 
 Dataframe example:

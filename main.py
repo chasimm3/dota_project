@@ -90,14 +90,7 @@ class OpenDota():
         
         list_of_files = glob.glob(staging_file_path + '*') # * means all, if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
-        print(latest_file)
-           
-        
-        # open existing dimension and store in dataframea
-        df_old = pd.read_csv(output_file, dtype=str, keep_default_na=False)
-        
-        df_old_comp = df_old[df_old.columns.difference(['effective_from_date', 'effective_to_date', 'dim_player_id'], sort=False)]
-        
+        print(latest_file)   
         
         # open the source file
         with open(latest_file, "r") as json_file:
@@ -109,43 +102,16 @@ class OpenDota():
         
         # # add effective to date column on the end
         current_date = datetime.now()
+        df['load_date'] = pd.Timestamp(current_date)
         
-        # save dataframe to csv file
-        df.to_csv(working_file, index=False)
-        
-        print('Player Transformation Complete: ' + output_file + ' created.')
-        
-        # read the working file as the new dataframe, converting data to strings for comparison with the old file
-        df_new = pd.read_csv(working_file, dtype=str, keep_default_na=False)
-        
-        # initiate data manipulation class then run compare_data against the old dataframe and new dataframe, output to dim_players.csv
-        comp_files = DataManipulation(self.tables_folder + 'dim_players.csv', self.delta_folder)
-        comp_files.compare_data('dim_players', df_old_comp, df_new, date=None)
-        
-        # read delta file into csv
-        comp_files = pd.read_csv(delta_file, dtype=str, keep_default_na=False)
-        
-        # merge old and comp files based on account_id
-        df_old = df_old.merge(comp_files, on='account_id', how='left', suffixes=('', '_tempCol'))
-        
-        # set effective from date, to date and dim_player_id for new and deleted (updated) records
-        df_old['effective_from_date'] = np.where(df_old['Change Type'] == "New", pd.Timestamp(current_date), df_old['effective_from_date'])
-        df_old['effective_to_date'] = np.where(df_old['Change Type'] == "Deleted", pd.Timestamp(current_date), df_old['effective_to_date'])
-        df_old['dim_player_id'] = np.where(df_old['Change Type'] == "New", df_old.index+1,  df_old['dim_player_id']).astype(int)
-        
-        # drop all _tempCols that were generated in the merge
-        df = df_old[df_old.columns.drop(list(df_old.filter(regex='_tempCol')))]
-        # drop Change Type column
-        df = df.drop(columns=['Change Type'])
-        
-        # sort dataframe by dim_player_id then reset the index
-        df = df.sort_values(by=['dim_player_id']).reset_index(drop=True)
-        
-        print(df)
+        # insert incremental integer in column 1 
+        df.insert(0, 'dim_player_id', range(1, 1 + len(df)))
         
         # load to csv, not including the index (I know I just reset it, it was for testing purposes)
-        df.to_csv(self.tables_folder + 'dim_players_test.csv', index=False)
+        df.to_csv(output_file, index=False)
         
+        print(self.tables_folder)
+        print('Player Transformation Complete: ' + output_file + ' created.')
         
         
         
@@ -198,8 +164,8 @@ class OpenDota():
         
         
     
-          
-base_file_path = 'C:/Work/Python/Dota/dota_project/'
+base_file_path = 'D:/General Storage/Python/Liquipedia Data Grab/dota_project/'         
+# base_file_path = 'C:/Work/Python/Dota/dota_project/'
 data_folder = base_file_path + 'Data/'
 delta_folder = base_file_path + 'Delta/'
 staging_folder = base_file_path + 'Staging/'
@@ -211,7 +177,7 @@ player_file_prefix = 'players_sorted_by_country'
 date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
 
 
-# create folders if they don't exist
+# create folders if they don't exist2
 pathlib.Path(staging_folder + 'pro_players/').mkdir(parents=True, exist_ok=True)
 pathlib.Path(staging_folder + 'recent_matches/').mkdir(parents=True, exist_ok=True)
 pathlib.Path(delta_folder).mkdir(parents=True, exist_ok=True)
@@ -222,8 +188,8 @@ pathlib.Path(tables_folder).mkdir(parents=True, exist_ok=True)
 
 open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, date1)
 
-# open_dota.load_players()
-# open_dota.load_matches() # takes fucking ages
+open_dota.load_players()
+open_dota.load_matches() # takes fucking ages
 open_dota.transform_players() 
 open_dota.transform_matches()
 

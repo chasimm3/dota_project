@@ -131,7 +131,7 @@ class OpenDota():
         # set effective from date, to date and dim_player_id for new and deleted (updated) records
         df_old['effective_from_date'] = np.where(df_old['Change Type'] == "New", pd.Timestamp(current_date), df_old['effective_from_date'])
         df_old['effective_to_date'] = np.where(df_old['Change Type'] == "Deleted", pd.Timestamp(current_date), df_old['effective_to_date'])
-        df_old['dim_player_id'] = np.where(df_old['Change Type'] == "New", str(len(df_old.index)),  df_old['dim_player_id']).astype(int)
+        df_old['dim_player_id'] = np.where(df_old['Change Type'] == "New", df_old.index+1,  df_old['dim_player_id']).astype(int)
         
         # drop all _tempCols that were generated in the merge
         df = df_old[df_old.columns.drop(list(df_old.filter(regex='_tempCol')))]

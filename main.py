@@ -6,10 +6,8 @@ import json
 import glob
 import os
 import time
-import pathlib
 import numpy as np
-from support import make_api_request, get_value_by_column, DataManipulation
-from collections import defaultdict
+from support import get_value_by_column, DataManipulation, load_json_to_file, create_folder
 
 
 class OpenDota():
@@ -21,35 +19,32 @@ class OpenDota():
         self.delta_folder = delta_folder
         self.staging_folder = staging_folder
         self.tables_folder = tables_folder
+    
+    def load_parent(self, url_x, folder):
+        # initialize variables
+        url = self.base_url + url_x
+        file_path = self.staging_folder + folder + date1 + '.json'
         
-        
-    def load_players(self):
-        
-        self.pro_player_url = 'proPlayers/'
-        self.players_file_path = self.staging_folder + 'pro_players/pro_players_' + date1 +'.json'
-        
-        if not os.path.exists(self.players_file_path):
-                
-            # api request to get pro players from Opendota
-            self.response = requests.get(self.base_url + self.pro_player_url)        
-            
-            # check if response is valid
-            # if self.response.status_code == 200:
-            new_data = self.response.json()
-     
-            # overwrite the existing data with the new data
-            with open(self.players_file_path, "w") as file:
-                json.dump(new_data, file, indent=4)
-                
-            print("New File Created: " + str(self.players_file_path))
-            
+        # send api request to url
+        response = requests.get(url)
+    
+        # convert response to json
+        new_data = response.json()
+
+        # load json to file path
+        load_json_to_file(new_data, file_path, 'w')
+    
+        print("New file created: " + str(file_path))
+
+          
             
     def load_matches(self):
         output_file = 'recent_matches_'
         output_folder = self.staging_folder + 'recent_matches/' + output_file
+        players_file_path = self.staging_folder + 'pro_players/pro_players_' + date1 +'.json'
         
         # open the players file
-        with open(self.players_file_path, "r") as json_file:
+        with open(players_file_path, "r") as json_file:
             data = json.load(json_file)
         
         i = 0
@@ -81,23 +76,17 @@ class OpenDota():
                         json.dump(self.matches, f, ensure_ascii=False, indent=4)            
                     time.sleep(1)         
         
-    def transform_players(self):
+    def transform_dimension(self, file_path, output_file_path, pk_name):
         
-        staging_file_path = self.staging_folder + 'pro_players/'
-        output_file = self.tables_folder + 'dim_players.csv'
-        working_file = self.delta_folder + 'dim_players_working_file.csv'
-        delta_file = self.delta_folder + 'dim_players_deltas.csv'
-        
-        list_of_files = glob.glob(staging_file_path + '*') # * means all, if need specific format then *.csv
+        list_of_files = glob.glob(file_path + '*') # * means all, if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
-        print(latest_file)   
+        print(latest_file)
         
-        # open the source file
         with open(latest_file, "r") as json_file:
-            player_data = json.load(json_file)
-
+            data = json.load(json_file)
+            
         # initialise dataframe of player data in the staging file
-        df = pd.json_normalize(player_data)
+        df = pd.json_normalize(data)
         
         
         # # add effective to date column on the end
@@ -105,14 +94,12 @@ class OpenDota():
         df['load_date'] = pd.Timestamp(current_date)
         
         # insert incremental integer in column 1 
-        df.insert(0, 'dim_player_id', range(1, 1 + len(df)))
+        df.insert(0, pk_name, range(1, 1 + len(df)))
         
         # load to csv, not including the index (I know I just reset it, it was for testing purposes)
-        df.to_csv(output_file, index=False)
+        df.to_csv(output_file_path, index=False)
         
-        print(self.tables_folder)
-        print('Player Transformation Complete: ' + output_file + ' created.')
-        
+        print('Player Transformation Complete: ' + output_file_path + ' created.')
         
         
     def transform_matches(self):
@@ -150,7 +137,7 @@ class OpenDota():
                 df2['account_id'] = u
                 
                 # get the dim_player_id for the account id
-                df2['dim_player_id'] = get_value_by_column(df_players, 'account_id', int(u), 'dim_player_id')
+                df2['fk_dim_player_id'] = get_value_by_column(df_players, 'account_id', int(u), 'dim_player_id')
                 
                 df = pd.concat([df2, df])
 
@@ -170,26 +157,34 @@ data_folder = base_file_path + 'Data/'
 delta_folder = base_file_path + 'Delta/'
 staging_folder = base_file_path + 'Staging/'
 tables_folder = base_file_path + 'Tables/'
-base_url = 'https://liquipedia.net/dota2/'
+base_url = 'https://api.opendota.com/api/'
 player_file_prefix = 'players_sorted_by_country'
 
 # get today's date
 date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
 
-
 # create folders if they don't exist2
-pathlib.Path(staging_folder + 'pro_players/').mkdir(parents=True, exist_ok=True)
-pathlib.Path(staging_folder + 'recent_matches/').mkdir(parents=True, exist_ok=True)
-pathlib.Path(delta_folder).mkdir(parents=True, exist_ok=True)
-pathlib.Path(data_folder).mkdir(parents=True, exist_ok=True)
-pathlib.Path(tables_folder).mkdir(parents=True, exist_ok=True)
-
-
+create_folder(staging_folder + 'pro_players/')
+create_folder(staging_folder + 'recent_matches/')
+create_folder(staging_folder + 'heroes/')
+create_folder(staging_folder + 'constants/items/')
+create_folder(staging_folder + 'constants/item_ids/')
+create_folder(delta_folder)
+create_folder(data_folder)
+create_folder(tables_folder)
 
 open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, date1)
 
-open_dota.load_players()
-open_dota.load_matches() # takes fucking ages
-open_dota.transform_players() 
+# open_dota.load_parent('heroes', 'heroes/heroes_')
+# open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
+# open_dota.load_parent('constants/items', 'constants/items/items_')
+# open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
+
+# open_dota.load_matches() # takes fucking ages
+
+# build dim_player
+open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
+# build dim_hero
+open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
 open_dota.transform_matches()
 

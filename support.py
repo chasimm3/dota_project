@@ -2,6 +2,8 @@ import requests
 import glob
 import os
 import pandas as pd
+import json
+import pathlib
 
 def make_api_request(self, url):
     try:
@@ -11,6 +13,22 @@ def make_api_request(self, url):
     except requests.RequestException as e:
         return {'error': str(e)}
     
+def load_json_to_file(json_data, file_path, mode=None):
+    try:
+        if mode != None:
+            with open(file_path, mode) as file:
+                json.dump(json_data, file, indent=4)
+        else:
+            with open(file_path, 'w') as file:
+                json.dump(json_data, file, indent=4)
+    except Exception as error:
+        print('Error in file creation: ' + repr(error))
+        
+def create_folder(path):
+    try:
+        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+    except Exception as error:
+        print(repr(error))
     
 # Function to get value based on column match
 def get_value_by_column(df, column_name, match_value, return_column):

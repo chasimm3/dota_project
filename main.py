@@ -149,6 +149,18 @@ class OpenDota():
         
         print('Match Transformation Complete: ' + output_file + ' created.')
         
+    def transform_items(self):
+    
+        items_file_path = self.staging_folder + 'constants/items/'
+        item_ids_file_path = self.staging_folder + 'constants/item_ids/'
+        output_file = self.tables_folder + 'dim_items.csv'    
+
+        with open(items_file_path, "r") as json_file:
+            items_data = json.load(json_file)
+            
+        df_items = pd.DataFrame(items_data)
+        
+        print(df_items)
         
     
 base_file_path = 'D:/General Storage/Python/Liquipedia Data Grab/dota_project/'         
@@ -182,9 +194,11 @@ open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, d
 
 # open_dota.load_matches() # takes fucking ages
 
-# build dim_player
-open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
-# build dim_hero
-open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
-open_dota.transform_matches()
+# # build dim_player
+# open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
+# # build dim_hero
+# open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
+# open_dota.transform_matches()
+
+open_dota.transform_items()
 

@@ -42,6 +42,57 @@ def get_value_by_column(df, column_name, match_value, return_column):
     else:
         return None
 
+# Function to load JSON data from a file
+def load_json(file_path):
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    return data
+
+
+# Function to flatten JSON data
+def flatten_json(json_data, item_name):
+    def flatten(item, prefix=''):
+        flattened = {}
+        if isinstance(item, dict):
+            for key, value in item.items():
+                if isinstance(value, dict):
+                    flattened.update(flatten(value, prefix + key + '_'))
+                elif isinstance(value, list):
+                    for i, sub_item in enumerate(value):
+                        flattened.update(flatten(sub_item, prefix + key + str(i) + '_'))
+                else:
+                    flattened[prefix + key] = value
+        else:
+            flattened[prefix] = item
+        return flattened
+
+    flattened = flatten(json_data)
+    flattened['item_name'] = item_name
+    return flattened
+
+# Function to convert JSON data to DataFrame with the first attribute as the constant column
+def json_to_dataframe(file_path):
+    data = load_json(file_path)
+
+    # List to store all items
+    all_items = []
+
+    # Iterate through each top-level key (item name)
+    for item_name, item_data in data.items():
+        flattened_data = flatten_json(item_data, item_name)
+        all_items.append(flattened_data)
+
+    # Convert the list of dictionaries to a DataFrame
+    df = pd.DataFrame(all_items)
+
+    # Ensure 'item_name' is the first column
+    columns = ['item_name'] + [col for col in df.columns if col != 'item_name']
+    df = df[columns]
+
+    return df
+
+
+
 
 class DataManipulation():
     def __init__(self, data_folder, delta_folder):

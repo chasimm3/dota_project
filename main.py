@@ -11,12 +11,10 @@ from support import get_value_by_column, DataManipulation, load_json_to_file, cr
 
 
 class OpenDota():
-    def __init__(self, data_folder, delta_folder, staging_folder, tables_folder, date1):
+    def __init__(self, staging_folder, tables_folder, date1):
         
         # initialise variables
         self.base_url = 'https://api.opendota.com/api/'
-        self.data_folder = data_folder
-        self.delta_folder = delta_folder
         self.staging_folder = staging_folder
         self.tables_folder = tables_folder
     
@@ -68,7 +66,7 @@ class OpenDota():
                 date_difference = current_date - last_match_time
                 if (date_difference < timedelta(hours=5)):# and player_name == 'SaberLight':
                     
-                    print(row['recent_matches_url'] + ' ' + str(account_id))
+                    print('Loading from URL: ' + row['recent_matches_url'] + '' + str(account_id))
                     self.matches = requests.get(row['recent_matches_url']).json()
 
                     with open(output_folder + str(account_id) + '.json', "w") as f:
@@ -79,7 +77,7 @@ class OpenDota():
         
         list_of_files = glob.glob(file_path + '*') # * means all, if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
-        print(latest_file)
+        print('Loading file: ' + latest_file)
         
         with open(latest_file, "r") as json_file:
             data = json.load(json_file)
@@ -249,12 +247,12 @@ class OpenDota():
 def add_apostrophes(s):
     return f"'{s}'"               
             
+# Get the file path of the python script
+base_file_path = os.path.dirname(__file__).replace('\\','/') + '/'
 
-    
-base_file_path = 'D:/General Storage/Python/Liquipedia Data Grab/dota_project/'         
-# base_file_path = 'C:/Work/Python/Dota/dota_project/'
-data_folder = base_file_path + 'Data/'
-delta_folder = base_file_path + 'Delta/'
+print('Base File Path: ' + base_file_path) 
+
+# declare variables
 staging_folder = base_file_path + 'Staging/'
 tables_folder = base_file_path + 'Tables/'
 base_url = 'https://api.opendota.com/api/'
@@ -263,7 +261,7 @@ player_file_prefix = 'players_sorted_by_country'
 # get today's date
 date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
 
-# create folders if they don't exist2
+# create folders if they don't exist
 create_folder(staging_folder + 'pro_players/')
 create_folder(staging_folder + 'recent_matches/')
 create_folder(staging_folder + 'heroes/')
@@ -271,20 +269,18 @@ create_folder(staging_folder + 'constants/items/')
 create_folder(staging_folder + 'constants/item_ids/')
 create_folder(staging_folder + 'constants/patchnotes/')
 create_folder(staging_folder + 'reference/')
-create_folder(delta_folder)
-create_folder(data_folder)
 create_folder(tables_folder)
 
 # initialise class
-open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, date1)
+open_dota = OpenDota(staging_folder, tables_folder, date1)
 
-# stage all data
-# open_dota.load_parent('heroes', 'heroes/heroes_')
-# open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
-# open_dota.load_parent('constants/items', 'constants/items/items_')
-# open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
-# open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
-# open_dota.load_matches() # takes fucking ages
+# # stage all data
+open_dota.load_parent('heroes', 'heroes/heroes_')
+open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
+open_dota.load_parent('constants/items', 'constants/items/items_')
+open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
+open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
+open_dota.load_matches() # takes fucking ages
 
 # build dim_items
 open_dota.transform_items('reference/')

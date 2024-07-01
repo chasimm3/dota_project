@@ -17,10 +17,10 @@
     <img src="images/Dota-2-Logo.png" alt="Logo" width="100" height="100">
   </a>
 
-<h3 align="center">Opendota Data Warehouse</h3>
+<h3 align="center">OpenDota Data Warehouse</h3>
 
   <p align="center">
-An all in one data warehouse utilising the API provided by Opendota.com. 
+An all in one data warehouse utilising the API provided by OpenDota.com. 
     <br />
     <a href="https://github.com/chasimm3/dota_project"><strong>Explore the docs »</strong></a>
     <br />

@@ -6,8 +6,7 @@ import json
 import glob
 import os
 import time
-import numpy as np
-from support import get_value_by_column, DataManipulation, load_json_to_file, create_folder, flatten_json
+from support import get_value_by_column, load_json_to_file, create_folder
 
 
 class OpenDota():

@@ -14,7 +14,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/chasimm3/dota_project">
-    <img src="images/Dota-2-Logo.png" alt="Logo" width="80" height="80">
+    <img src="images/Dota-2-Logo.png" alt="Logo" width="100" height="100">
   </a>
 
 <h3 align="center">Opendota Data Warehouse</h3>
@@ -65,7 +65,7 @@ An all in one data warehouse utilising the API provided by Opendota.com.
 <br />
 <div align="center">
   <a href="https://github.com/chasimm3/dota_project">
-    <img src="images/example.png" width="1415" height="674">
+    <img src="images/Example.png" width="1415" height="674">
   </a>
  </div>
 

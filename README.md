@@ -65,7 +65,7 @@ An all in one data warehouse utilising the API provided by OpenDota.com.
 <br />
 <div align="center">
   <a href="https://github.com/chasimm3/dota_project">
-    <img src="images/Example.png" width="1415" height="674">
+    <img src="images/Example.png" width="1415" height="560">
   </a>
  </div>
 

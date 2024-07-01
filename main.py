@@ -96,7 +96,7 @@ class OpenDota():
         df.insert(0, pk_name, range(1, 1 + len(df)))
         
         # load to csv, not including the index (I know I just reset it, it was for testing purposes)
-        df.to_csv(output_file_path, index=False)
+        df.to_csv(output_file_path, index=False, sep='|')
         
         print('Player Transformation Complete: ' + output_file_path + ' created.')
         
@@ -106,14 +106,30 @@ class OpenDota():
         matches_file_path = self.staging_folder + 'recent_matches/'
         output_file = self.tables_folder + 'fact_matches.csv'
         
-        list_of_files = glob.glob(matches_file_path + '*')      
+        list_of_files = []
+        
+        # only get files that are loaded today:
+        for filename in os.listdir(matches_file_path):
+            file_path = os.path.join(matches_file_path, filename)
+            
+            # if file, get creation time and date
+            if os.path.isfile(file_path):
+                create_time = os.path.getctime(file_path)
+                creation_date = datetime.fromtimestamp(create_time).date()
+                
+                if creation_date == datetime.now().date():
+                    list_of_files.append(file_path)
+
+
+        # list all files in folder
+        # list_of_files = glob.glob(matches_file_path + '*')      
         
         df = pd.DataFrame()
         
         # load players csv file to dataframe            
         players_file = self.tables_folder + 'dim_players.csv'
         df_players = pd.DataFrame()
-        df_players = pd.read_csv(players_file, header='infer')
+        df_players = pd.read_csv(players_file, header='infer', sep='|')
         
         # loop through json files in staging folder
         for i in list_of_files:
@@ -124,7 +140,6 @@ class OpenDota():
                 df2 = pd.json_normalize(match_data)
                 
                 # get account_id from the file name and add it as an additional columns
-
                 # -> reverse the path 
                 # -> within the reverse of the path find the location of the first _ 
                 # -> take everything to the left of the first underscore 
@@ -141,171 +156,93 @@ class OpenDota():
                 df = pd.concat([df2, df])
 
         current_date = datetime.now()
-        df['effective_from_date'] = pd.Timestamp(current_date)
+        df['load_date'] = pd.Timestamp(current_date)
         
         # save dataframe to csv file
         df.to_csv(output_file, index=False)
         
         print('Match Transformation Complete: ' + output_file + ' created.')
         
-    def transform_items(self):
-    
+    def transform_items(self, reference_folder):
         items_file_path = self.staging_folder + 'constants/items/'
-        item_ids_file_path = self.staging_folder + 'constants/item_ids/'
-        output_file = self.tables_folder + 'dim_items.csv'    
+        output_file_path = self.tables_folder + 'dim_items.csv'    
+        live_items_file_path = self.staging_folder + reference_folder + 'items_live.csv'
+        
+        # establish dataframe of live items
+        df_live_items = pd.read_csv(live_items_file_path)
         
         # open latest items file and write to dataframe
         list_of_files = glob.glob(items_file_path + '*') # * means all, if need specific format then *.csv
         items_latest_file = max(list_of_files, key=os.path.getctime)
-        print(items_latest_file)
+        print("Starting Item Transformation. Loading data from: " + items_latest_file)
+        # items_latest_file = 'D:/General Storage/Python/Liquipedia Data Grab/dota_project/Staging/constants/items/items_20240627.json'
         with open(items_latest_file, "r") as json_file:
             items_data = json.load(json_file)
         
+        
+        # transpose the items data to column then rename it to item_name
         df_items = pd.DataFrame(items_data).transpose().reset_index().rename(columns={"index":"item_name"})
-        # df_items = df_items.transpose()
-        # df_items = df_items.reset_index()
-        # df_items = df_items.rename(columns={'index':'item_name'})
-        
-        df_abilities = []
-        df_abilities = (pd.concat({i: pd.DataFrame(x) for i, x in df_items.pop('abilities').items()})
-         .reset_index(level=1, drop=True)
-         .join(df_abilities)
-         .reset_index(drop=True).rename(columns={'title':'item_name'}).reindex())
 
-        df_attrib = []
-        # df_attrib = (pd.concat({i: pd.DataFrame(x) for i, x in df_items.pop('attrib').items()})
-        #  .reset_index(level=1, drop=True)
-        #  .join(df_attrib)
-        #  .reset_index(drop=True).reindex())
-        # print(df_attrib)
-        
+        # join the items to the live items to remove non-live items from the dataframe
+        df_items = pd.merge(df_items, df_live_items, how='inner', left_on='id', right_on='ItemID')
         
 
-        # Extract 'attrib' and 'item_name' columns from df_items
-        attrib_series = df_items['attrib']
-        item_name_series = df_items['item_name']
+        # Extract 'ability' and 'item_name' columns from df_items, remove items without an ability array
+        ability_series = df_items['abilities'].dropna()
+        df_item_name = pd.DataFrame(df_items['item_name'])
         
-        print(attrib_series)
+        # for each record pivot the series to new columns
+        df_ability_list = pd.concat({i: pd.DataFrame(x) for i, x in ability_series.items()})
+        # join the ability list and to the item names based on the index 
+        df_abilities = pd.DataFrame.join(df_ability_list.reset_index(), df_item_name.reset_index(), on='level_0').drop(columns={'level_0', 'level_1','index'}).reindex()
+        
+        # rename old columns and format item_name for joining
+        df_abilities = df_abilities.rename(columns={'title':'ability_title','type':'ability_type','description':'ability_description'})
+        df_abilities['item_name'] = df_abilities['item_name'].str.replace('_', ' ').str.lower()
+
+
+        # Extract 'attrib' and 'item_name' columns from df_items, remove items without an attrib array
+        attrib_series = df_items['attrib'].dropna()
+        df_item_name = pd.DataFrame(df_items['item_name'])
+
+        # for each record pivot the series to new columns
         df_attrib_list = pd.concat({i: pd.DataFrame(x) for i, x in attrib_series.items()})
+        # join the attrib list and to the item names based on the index 
+        df_attribs = pd.DataFrame.join(df_attrib_list.reset_index(), df_item_name.reset_index(), on='level_0').drop(columns={'level_0', 'level_1','index'}).reindex()
+        
+        # rename attribute columns
+        df_attribs = df_attribs.rename(columns={'key':'attribute_type','value':'attribute_value','display':'attribute_display'})
+             
+        # remove spaces and make item_name lower case
+        df_attribs['item_name'] = df_attribs['item_name'].str.replace('_', ' ').str.lower()
 
-        # # Create a DataFrame from the 'attrib' column dictionaries
-        # df_attrib_list = [pd.DataFrame(x, index=[i]) for i, x in attrib_series.items()]
-
-        
-        print(df_attrib_list)
-        
-            
-            
-        # # Concatenate the DataFrames in the list
-        df_attrib = pd.concat(df_attrib_list)
-
-        # # Reset the index to make it contiguous
-        # df_attrib = df_attrib.reset_index(drop=True)
-
-        # # Map the original index to the item names
-        # df_attrib['item_name'] = [item_name_series[i] for i in df_attrib.index // len(df_attrib_list[0])]
-
-        # # Reindex to ensure a contiguous index
-        # df_attrib = df_attrib.reindex()
-                
-        # print(df_attrib)
-        
-        # df_attrib = df_attrib.transpose()
-
-        # df_attrib.columns = df_attrib.iloc[0]
-        # df_attrib = df_attrib.iloc[1:].rename_axis(None, axis=1).reset_index()
-        # df_attrib = df_attrib[:-1].drop("index", axis=1)
-        
-        # print(df_attrib)        
-        
-        # # df_items['attrib'] = df_items['attrib'].apply(add_apostrophes)
-        # df_items['attrib'] = df_items['attrib'].str.replace("'", '"').to_csv(self.staging_folder + 'output.csv', sep='|', index=False)
-        # df_items['attrib'].to_csv(self.staging_folder + 'output.csv', sep='|', index=False)
-        # print(df_items['attrib'].iloc[0])
-        
-        # df_items.to_csv(self.staging_folder + 'output.csv', sep='|', index=False)
-        
-        # # Convert JSON strings to lists of dictionaries
-
-        # # Step 1: Convert JSON strings to lists of dictionaries
-        # df_items['attrib'] = df_items['attrib'].apply(json.loads)
-
-        # # Step 2: Flatten the JSON arrays
-        # df_exploded = df_items.explode('attrib')
-
-        # # Step 3: Normalize the JSON objects into separate columns
-        # df_flattened = pd.concat([df_exploded.drop(columns=['attrib']), df_exploded['attrib'].apply(pd.Series)], axis=1)
-        # '[{'key': 'blink_range', 'value': '1200'}, {'key': 'blink_damage_cooldown', 'value': '3.0'}, {'key': 'blink_range_clamp', 'value': '960'}]'
-        
-        # print(df_flattened)
-        
-        
-        # for i, row in df_items.iterrows():
-        #     print(row.attrib)
-        
-        #     # Step 1: Convert JSON strings to lists of dictionaries
-        #     df_attrib = pd.json_normalize(row.attrib)
-        #     print(df_attrib)
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        # Convert both columns to lower case
+        df_abilities['item_name'] = df_abilities['item_name'].str.lower()
+    
         # Replace underscores with spaces in the 'item_name' column
         df_items['item_name'] = df_items['item_name'].str.replace('_', ' ').str.lower()
 
-        # Convert both columns to lower case
-        # df_items['item_name'] = df_items['item_name'].str.lower()
-        df_abilities['item_name'] = df_abilities['item_name'].str.lower()
-
-        # Perform the merge on the lower case columns
-        df_merged = pd.merge(df_items, df_abilities, left_on='item_name', right_on='item_name')
-
-        # print(df_merged)
+        # merge df_items and df_abiliites on item_name
+        df_merged = pd.merge(df_items, df_abilities, how='left', left_on='item_name', right_on='item_name')
         
+        # merge df_merged and df_attribs on item_name
+        df_merged = pd.merge(df_merged, df_attribs, how='left', left_on='item_name', right_on='item_name').drop(columns={'abilities','attrib'})        
         
+        # drop live items columns
+        df_merged = df_merged.drop(columns={"ItemID",	"InternalName",	"EnglishName"})
         
-        #  open latest item_ids file and write to dataframe
-        list_of_files = glob.glob(item_ids_file_path + '*') # * means all, if need specific format then *.csv
-        item_ids_latest_file = max(list_of_files, key=os.path.getctime)
+        # # add effective to date column on the end
+        current_date = datetime.now()
+        df_merged['load_date'] = pd.Timestamp(current_date)
         
-        with open(item_ids_latest_file, "r") as json_file:
-            item_ids_data = json.load(json_file)
-            
+        # insert incremental integer in column 1 
+        df_merged.insert(0, 'dim_item_id', range(1, 1 + len(df_merged)))
         
-        # pivot the item_ids dataframe into 2 columns, item_id and item_name
-        df_item_ids = pd.DataFrame(item_ids_data, index=[0])
+        # write to csv
+        df_merged.to_csv(output_file_path, index=False, sep='|')
         
-        df_item_ids = df_item_ids.melt(var_name='item_id', value_name='item_name')
+        print('Item Transformation Complete: ' + output_file_path + ' created.')
         
-        
-        
-        
-        # df_items.to_csv(self.staging_folder + 'output.csv', sep='|', index=False)
-            
-        # # List to store all items
-        # all_items = []
-
-        # # Iterate through each top-level key (item name)
-        # for item_name, item_data in items_data.items():
-        #     flattened_data = flatten_json(item_data, item_name)
-        #     all_items.append(flattened_data)
-
-        # # Convert the list of dictionaries to a DataFrame
-        # df = pd.DataFrame(all_items)
-
-        # # Ensure 'item_name' is the first column
-        # columns = ['item_name'] + [col for col in df.columns if col != 'item_name']
-        # df = df[columns]
-        
-        # print(df)
 
         
 # Function to add apostrophes
@@ -333,12 +270,15 @@ create_folder(staging_folder + 'heroes/')
 create_folder(staging_folder + 'constants/items/')
 create_folder(staging_folder + 'constants/item_ids/')
 create_folder(staging_folder + 'constants/patchnotes/')
+create_folder(staging_folder + 'reference/')
 create_folder(delta_folder)
 create_folder(data_folder)
 create_folder(tables_folder)
 
+# initialise class
 open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, date1)
 
+# stage all data
 # open_dota.load_parent('heroes', 'heroes/heroes_')
 # open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
 # open_dota.load_parent('constants/items', 'constants/items/items_')
@@ -346,11 +286,13 @@ open_dota = OpenDota(data_folder, delta_folder, staging_folder, tables_folder, d
 # open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
 # open_dota.load_matches() # takes fucking ages
 
-# # build dim_player
-# open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
-# # build dim_hero
-# open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
-# open_dota.transform_matches()
+# build dim_items
+open_dota.transform_items('reference/')
+# build dim_player
+open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
+# build dim_hero
+open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
+# transform matches
+open_dota.transform_matches()
 
-open_dota.transform_items()
 

@@ -156,7 +156,7 @@ class OpenDota():
         df['load_date'] = pd.Timestamp(current_date)
         
         # save dataframe to csv file
-        df.to_csv(output_file, index=False)
+        df.to_csv(output_file, index=False, sep='|')
         
         print('Match Transformation Complete: ' + output_file + ' created.')
         

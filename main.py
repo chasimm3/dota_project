@@ -6,16 +6,17 @@ import json
 import glob
 import os
 import time
-from support import get_value_by_column, load_json_to_file, create_folder
+from support import get_value_by_column, load_json_to_file, create_folder, load_csv, load_parquet
 
 
 class OpenDota():
-    def __init__(self, staging_folder, tables_folder, date1):
+    def __init__(self, staging_folder, tables_folder, date1, output_file_type):
         
         # initialise variables
         self.base_url = 'https://api.opendota.com/api/'
         self.staging_folder = staging_folder
         self.tables_folder = tables_folder
+        self.output_file_type = output_file_type
     
     def load_parent(self, url_x, folder):
         # initialize variables
@@ -92,16 +93,22 @@ class OpenDota():
         # insert incremental integer in column 1 
         df.insert(0, pk_name, range(1, 1 + len(df)))
         
-        # load to csv, not including the index (I know I just reset it, it was for testing purposes)
-        df.to_csv(output_file_path, index=False, sep='|')
+        # load dataframe to file, not including the index (I know I just reset it, it was for testing purposes)
+
+        if self.output_file_type == 'csv':
+            load_csv(df, output_file_path + '.csv', '|')
+        if self.output_file_type == 'parquet':
+            load_parquet(df, output_file_path + '.parquet.gzip')
         
-        print('Player Transformation Complete: ' + output_file_path + ' created.')
+        
+        print('Player Transformation Complete: ' + output_file_path + '.' + output_file_type + ' created.')
         
         
     def transform_matches(self):
         
         matches_file_path = self.staging_folder + 'recent_matches/'
-        output_file = self.tables_folder + 'fact_matches.csv'
+        output_file = self.tables_folder + 'fact_matches'
+        # output_file = self.tables_folder + 'fact_matches'
         
         list_of_files = []
         
@@ -123,10 +130,16 @@ class OpenDota():
         
         df = pd.DataFrame()
         
+        
         # load players csv file to dataframe            
-        players_file = self.tables_folder + 'dim_players.csv'
         df_players = pd.DataFrame()
-        df_players = pd.read_csv(players_file, header='infer', sep='|')
+        if self.output_file_type ==  'csv':
+            players_file = self.tables_folder + 'dim_players.csv'
+            df_players = pd.read_csv(players_file, header='infer', sep='|')
+        if self.output_file_type == 'parquet':
+            players_file = self.tables_folder + 'dim_players.parquet.gzip'
+            df_players = pd.read_parquet(players_file)
+        
         
         # loop through json files in staging folder
         for i in list_of_files:
@@ -156,14 +169,19 @@ class OpenDota():
         df['load_date'] = pd.Timestamp(current_date)
         
         # save dataframe to csv file
-        df.to_csv(output_file, index=False, sep='|')
+        if self.output_file_type == 'csv':
+            load_csv(df, output_file + '.csv', '|')
+        if self.output_file_type == 'parquet':
+            load_parquet(df, output_file + '.parquet.gzip')
+                
         
         print('Match Transformation Complete: ' + output_file + ' created.')
         
     def transform_items(self, reference_folder):
         items_file_path = self.staging_folder + 'constants/items/'
-        output_file_path = self.tables_folder + 'dim_items.csv'    
+        # output_file_path = self.tables_folder + 'dim_items.csv'    
         live_items_file_path = self.staging_folder + reference_folder + 'items_live.csv'
+        output_file_path = self.tables_folder + 'dim_items'
         
         # establish dataframe of live items
         df_live_items = pd.read_csv(live_items_file_path)
@@ -235,17 +253,19 @@ class OpenDota():
         # insert incremental integer in column 1 
         df_merged.insert(0, 'dim_item_id', range(1, 1 + len(df_merged)))
         
-        # write to csv
-        df_merged.to_csv(output_file_path, index=False, sep='|')
         
-        print('Item Transformation Complete: ' + output_file_path + ' created.')
+        # save dataframe to specified output file type
+        if self.output_file_type == 'csv':
+            load_csv(df_merged, output_file_path + '.csv', '|')
+        if self.output_file_type == 'parquet':
+            # convert non-parquet function columns to str
+            df_merged = df_merged.astype(str)
+            load_parquet(df_merged, output_file_path + '.parquet.gzip')
+        
+        print('Item Transformation Complete: ' + output_file_path + '.' + output_file_type + ' created.')
         
 
         
-# Function to add apostrophes
-def add_apostrophes(s):
-    return f"'{s}'"               
-            
 # Get the file path of the python script
 base_file_path = os.path.dirname(__file__).replace('\\','/') + '/'
 
@@ -256,6 +276,8 @@ staging_folder = base_file_path + 'Staging/'
 tables_folder = base_file_path + 'Tables/'
 base_url = 'https://api.opendota.com/api/'
 player_file_prefix = 'players_sorted_by_country'
+output_file_type = 'parquet'
+
 
 # get today's date
 date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
@@ -271,7 +293,7 @@ create_folder(staging_folder + 'reference/')
 create_folder(tables_folder)
 
 # initialise class
-open_dota = OpenDota(staging_folder, tables_folder, date1)
+open_dota = OpenDota(staging_folder, tables_folder, date1, output_file_type)
 
 # # stage all data
 open_dota.load_parent('heroes', 'heroes/heroes_')
@@ -284,10 +306,12 @@ open_dota.load_matches() # takes fucking ages
 # build dim_items
 open_dota.transform_items('reference/')
 # build dim_player
-open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
+open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players', 'dim_player_id')
 # build dim_hero
-open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
+open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes', 'dim_hero_id')
 # transform matches
 open_dota.transform_matches()
+
+
 
 

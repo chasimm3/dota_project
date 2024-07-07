@@ -1,5 +1,6 @@
 import json
 import pathlib
+import pandas as pd
 
 
 def load_json_to_file(json_data, file_path, mode=None):
@@ -31,3 +32,9 @@ def get_value_by_column(df, column_name, match_value, return_column):
     else:
         return None
 
+
+def load_parquet(dataframe, file_name):
+    dataframe.to_parquet(file_name, compression='gzip')
+    
+def load_csv(dataframe, file_name, seperator):
+    dataframe.to_csv(file_name, index=False, sep=seperator)

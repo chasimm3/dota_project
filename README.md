@@ -71,16 +71,13 @@ An example of the data structure within the Matches fact table.
 
 ## Getting Started
 
-When executed, the script will execute some GET API calls against the OpenDota API. It will stage the json data in a series of staging folders, then transform the data into a Kimball dimensional model. 
+When executed, the script will execute some GET API calls against the OpenDota API. It will stage the json data in a series of staging folders, then transform the data into a Kimball dimensional model.
 
-Currently there are 3 dimensions and 1 fact table in the model, this are Dim_Player, Dim_Item, Dim_Hero, and Fact_Matches. Dim_Hero and Dim_Item currently 
-
-
-
+Currently there are 3 dimensions and 1 fact table in the model, this are Dim_Player, Dim_Item, Dim_Hero, and Fact_Matches. Dim_Hero and Dim_Item currently
 
 To get started with this repository, start by cloning the repo onto your machine. From there the code can be executed immediately with default configuration, which is as follows:
 
-**Staging Folder** 
+**Staging Folder**
 
 The file path of config.py appended with Staging/.
 
@@ -96,10 +93,9 @@ The default file type is xlsx.
 
 The default is set to true.
 
-
 ### Prerequisites
 
-A basic knowledge of running python code, including change parameters before execution. This is best done in an IDE such as VSCode. 
+A basic knowledge of running python code, including change parameters before execution. This is best done in an IDE such as VSCode.
 
 Ensure that you have pip installed and are upgraded to the latest version.
 

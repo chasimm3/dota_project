@@ -8,6 +8,7 @@ import glob
 import os
 import time
 from support import get_value_by_column, load_json_to_file, create_folder, load_csv, load_parquet, load_excel
+import config
 
 
 class OpenDota():
@@ -18,12 +19,13 @@ class OpenDota():
         self.staging_folder = staging_folder
         self.tables_folder = tables_folder
         self.output_file_type = output_file_type
+        self.date1 = date1
         
     
     def load_parent(self, url_x, folder):
         # initialize variables
         url = self.base_url + url_x
-        file_path = self.staging_folder + folder + date1 + '.json'
+        file_path = self.staging_folder + folder + self.date1 + '.json'
         
         # send api request to url
         response = requests.get(url)
@@ -40,7 +42,7 @@ class OpenDota():
     def load_matches(self):
         output_file = 'recent_matches_'
         output_folder = self.staging_folder + 'recent_matches/' + output_file
-        players_file_path = self.staging_folder + 'pro_players/pro_players_' + date1 +'.json'
+        players_file_path = self.staging_folder + 'pro_players/pro_players_' + self.date1 +'.json'
         
         # open the players file
         with open(players_file_path, "r") as json_file:
@@ -102,13 +104,13 @@ class OpenDota():
             load_csv(df, output_file_path + '.csv', '|')
         if self.output_file_type == 'parquet':
             load_parquet(df, output_file_path + '.parquet.gzip')
-        if self.output_file_type == 'excel' and output_file_excel_single_file == False: 
+        if self.output_file_type == 'xlsx' and output_file_excel_single_file == False: 
             load_excel(df, output_file_path, dimension_name, False)
-        if self.output_file_type == 'excel' and output_file_excel_single_file == True:
+        if self.output_file_type == 'xlsx' and output_file_excel_single_file == True:
             load_excel(df, 'Tables/single_file', dimension_name, True)    
 
         
-        print('Player Transformation Complete: ' + output_file_path + '.' + output_file_type + ' created.')
+        print('Player Transformation Complete: ' + output_file_path + '.' + self.output_file_type + ' created.')
         
         
     def transform_matches(self):
@@ -142,13 +144,28 @@ class OpenDota():
         if self.output_file_type == 'parquet':
             players_file = self.tables_folder + 'dim_player.parquet.gzip'
             df_players = pd.read_parquet(players_file)
-        if self.output_file_type == 'excel' and output_file_excel_single_file == False:
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False:
             players_file = self.tables_folder + 'dim_player.xlsx'
             df_players = pd.read_excel(players_file)
-        if self.output_file_type == 'excel' and output_file_excel_single_file == True:
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
             players_file = self.tables_folder + 'single_file.xlsx'
             df_players = pd.read_excel(players_file, sheet_name='dim_player')
-        
+
+        # load players csv file to dataframe using support functions depending on output type
+        df_hero = pd.DataFrame()
+        if self.output_file_type ==  'csv':
+            hero_file = self.tables_folder + 'dim_hero.csv'
+            df_hero = pd.read_csv(players_file, header='infer', sep='|')
+        if self.output_file_type == 'parquet':
+            hero_file = self.tables_folder + 'dim_hero.parquet.gzip'
+            df_hero = pd.read_parquet(players_file)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False:
+            hero_file = self.tables_folder + 'dim_hero.xlsx'
+            df_hero = pd.read_excel(players_file)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
+            hero_file = self.tables_folder + 'single_file.xlsx'
+            df_hero = pd.read_excel(players_file, sheet_name='dim_hero')
+           
         
         # loop through json files in staging folder
         for i in list_of_files:
@@ -172,8 +189,13 @@ class OpenDota():
                 # get the dim_player_id for the account id
                 df2['fk_dim_player_id'] = get_value_by_column(df_players, 'account_id', int(u), 'dim_player_id')
                 
+                # df2['fk_dim_hero_id'] = get_value_by_column(df_hero, ''
+                
                 df = pd.concat([df2, df])
 
+        # merge dataframe to hero dimension and pull in dim_hero_id to a new column, fk_dim_hero_id
+        df = df.merge(df_hero[['dim_hero_id', 'id']],  left_on='hero_id', right_on='id', how='left').rename(columns={'dim_hero_id':'fk_dim_hero_id'}).drop(columns='id')   
+        
         current_date = datetime.now()
         df['load_date'] = pd.Timestamp(current_date)
         
@@ -182,9 +204,9 @@ class OpenDota():
             load_csv(df, output_file_path + '.csv', '|')
         if self.output_file_type == 'parquet':
             load_parquet(df, output_file_path + '.parquet.gzip')
-        if self.output_file_type == 'excel' and output_file_excel_single_file == False: 
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False: 
             load_excel(df, output_file_path, 'fact_matches', False)
-        if self.output_file_type == 'excel' and output_file_excel_single_file == True:
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
             load_excel(df, 'Tables/single_file', 'fact_matches', True)    
                 
         
@@ -274,44 +296,27 @@ class OpenDota():
             # convert non-parquet function columns to str
             df_merged = df_merged.astype(str)
             load_parquet(df_merged, output_file_path + '.parquet.gzip')
-        if self.output_file_type == 'excel' and output_file_excel_single_file == False: 
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False: 
             load_excel(df_merged, output_file_path, 'dim_item', False)
-        if self.output_file_type == 'excel' and output_file_excel_single_file == True:
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
             load_excel(df_merged, 'Tables/single_file', 'dim_item', True)    
         
-        print('Item Transformation Complete: ' + output_file_path + '.' + output_file_type + ' created.')
-        
-
-        
-# Get the file path of the python script
-base_file_path = os.path.dirname(__file__).replace('\\','/') + '/'
-
-print('Base File Path: ' + base_file_path) 
-
-# declare variables
-staging_folder = base_file_path + 'Staging/'
-tables_folder = base_file_path + 'Tables/'
-base_url = 'https://api.opendota.com/api/'
-player_file_prefix = 'players_sorted_by_country'
-output_file_type = 'excel'
-output_file_excel_single_file = True
+        print('Item Transformation Complete: ' + output_file_path + '.' + config.output_file_type + ' created.')
 
 
-# get today's date
-date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
 
 # create folders if they don't exist
-create_folder(staging_folder + 'pro_players/')
-create_folder(staging_folder + 'recent_matches/')
-create_folder(staging_folder + 'heroes/')
-create_folder(staging_folder + 'constants/items/')
-create_folder(staging_folder + 'constants/item_ids/')
-create_folder(staging_folder + 'constants/patchnotes/')
-create_folder(staging_folder + 'reference/')
-create_folder(tables_folder)
+create_folder(config.staging_folder + 'pro_players/')
+create_folder(config.staging_folder + 'recent_matches/')
+create_folder(config.staging_folder + 'heroes/')
+create_folder(config.staging_folder + 'constants/items/')
+create_folder(config.staging_folder + 'constants/item_ids/')
+create_folder(config.staging_folder + 'constants/patchnotes/')
+create_folder(config.staging_folder + 'reference/')
+create_folder(config.tables_folder)
 
 # initialise class
-open_dota = OpenDota(staging_folder, tables_folder, date1, output_file_type)
+open_dota = OpenDota(config.staging_folder, config.tables_folder, config.date1, config.output_file_type)
 
 # # stage all data
 open_dota.load_parent('heroes', 'heroes/heroes_')
@@ -324,9 +329,9 @@ open_dota.load_matches() # takes fucking ages
 # build dim_items
 open_dota.transform_items('reference/')
 # build dim_player
-open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_player', 'dim_player', output_file_excel_single_file)
-# build dim_hero
-open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_hero', 'dim_hero', output_file_excel_single_file)
+open_dota.transform_dimension(config.staging_folder + 'pro_players/', config.tables_folder + 'dim_player', 'dim_player', config.output_file_excel_single_file)
+# # build dim_hero
+open_dota.transform_dimension(config.staging_folder + 'heroes/', config.tables_folder + 'dim_hero', 'dim_hero', config.output_file_excel_single_file)
 # # transform matches
 open_dota.transform_matches()
 

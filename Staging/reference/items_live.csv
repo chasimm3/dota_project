@@ -1,0 +1,435 @@
+ItemID,InternalName,EnglishName
+1,item_blink,Blink Dagger
+600,item_overwhelming_blink,Overwhelming Blink
+603,item_swift_blink,Swift Blink
+604,item_arcane_blink,Arcane Blink
+606,item_recipe_arcane_blink,Arcane Blink Recipe
+607,item_recipe_swift_blink,Swift Blink Recipe
+608,item_recipe_overwhelming_blink,Overwhelming Blink Recipe
+2,item_blades_of_attack,Blades of Attack
+3,item_broadsword,Broadsword
+4,item_chainmail,Chainmail
+5,item_claymore,Claymore
+6,item_helm_of_iron_will,Helm of Iron Will
+7,item_javelin,Javelin
+8,item_mithril_hammer,Mithril Hammer
+9,item_platemail,Platemail
+11,item_quelling_blade,Quelling Blade
+237,item_faerie_fire,Faerie Fire
+265,item_infused_raindrop,Infused Raindrops
+244,item_wind_lace,Wind Lace
+12,item_ring_of_protection,Ring of Protection
+247,item_moon_shard,Moon Shard
+13,item_gauntlets,Gauntlets of Strength
+14,item_slippers,Slippers of Agility
+15,item_mantle,Mantle of Intelligence
+16,item_branches,Iron Branch
+17,item_belt_of_strength,Belt of Strength
+18,item_boots_of_elves,Band of Elvenskin
+19,item_robe,Robe of the Magi
+20,item_circlet,Circlet
+261,item_crown,Crown
+1122,item_diadem,Diadem
+21,item_ogre_axe,Ogre Axe
+22,item_blade_of_alacrity,Blade of Alacrity
+23,item_staff_of_wizardry,Staff of Wizardry
+24,item_ultimate_orb,Ultimate Orb
+25,item_gloves,Gloves of Haste
+485,item_blitz_knuckles,Blitz Knuckles
+26,item_lifesteal,Morbid Mask
+473,item_voodoo_mask,Voodoo Mask
+27,item_ring_of_regen,Ring of Regen
+28,item_sobi_mask,Sage's Mask
+29,item_boots,Boots of Speed
+30,item_gem,Gem of True Sight
+31,item_cloak,Cloak
+32,item_talisman_of_evasion,Talisman of Evasion
+33,item_cheese,Cheese
+34,item_magic_stick,Magic Stick
+35,item_recipe_magic_wand,Magic Wand Recipe
+36,item_magic_wand,Magic Wand
+37,item_ghost,Ghost Scepter
+38,item_clarity,Clarity
+216,item_enchanted_mango,Enchanted Mango
+4204,item_famango,Healing Lotus
+4205,item_great_famango,Great Healing Lotus
+4206,item_greater_famango,Greater Healing Lotus
+1123,item_blood_grenade,Blood Grenade
+1154,item_royale_with_cheese,Block of Cheese
+39,item_flask,Healing Salve
+40,item_dust,Dust of Appearance
+41,item_bottle,Bottle
+42,item_ward_observer,Observer Ward
+43,item_ward_sentry,Sentry Ward
+218,item_ward_dispenser,Observer and Sentry Wards
+44,item_tango,Tango
+241,item_tango_single,Tango (Shared)
+45,item_courier,Animal Courier
+286,item_flying_courier,Flying Courier
+46,item_tpscroll,Town Portal Scroll
+47,item_recipe_travel_boots,Boots of Travel Recipe
+48,item_travel_boots,Boots of Travel
+220,item_travel_boots_2,Boots of Travel 2
+50,item_phase_boots,Phase Boots
+51,item_demon_edge,Demon Edge
+52,item_eagle,Eaglesong
+53,item_reaver,Reaver
+54,item_relic,Sacred Relic
+55,item_hyperstone,Hyperstone
+56,item_ring_of_health,Ring of Health
+279,item_ring_of_tarrasque,Ring of Tarrasque
+57,item_void_stone,Void Stone
+1802,item_tiara_of_selemene,Tiara of Selemene
+58,item_mystic_staff,Mystic Staff
+59,item_energy_booster,Energy Booster
+60,item_point_booster,Point Booster
+61,item_vitality_booster,Vitality Booster
+593,item_fluffy_hat,Fluffy Hat
+63,item_power_treads,Power Treads
+1098,item_recipe_samurai_tabi,Samurai Tabi Recipe
+1091,item_samurai_tabi,Samurai Tabi
+1092,item_recipe_hermes_sandals,Hermes Sandals Recipe
+1093,item_hermes_sandals,Hermes Sandals
+1099,item_recipe_witches_switch,Witches Switch Recipe
+1100,item_witches_switch,Witches Switch
+1094,item_recipe_lunar_crest,Lunar Crest Recipe
+1095,item_lunar_crest,Lunar Crest
+1106,item_recipe_phylactery,Phylactery Recipe
+1107,item_phylactery,Phylactery
+1807,item_recipe_angels_demise,Khanda Recipe
+1808,item_angels_demise,Khanda
+64,item_recipe_hand_of_midas,Hand of Midas Recipe
+65,item_hand_of_midas,Hand of Midas
+67,item_oblivion_staff,Oblivion Staff
+533,item_recipe_witch_blade,Witch Blade Recipe
+534,item_witch_blade,Witch Blade
+69,item_pers,Perseverance
+1125,item_cornucopia,Cornucopia
+71,item_poor_mans_shield,Poor Man's Shield
+731,item_satchel,Satchel
+72,item_recipe_bracer,Bracer Recipe
+73,item_bracer,Bracer
+74,item_recipe_wraith_band,Wraith Band Recipe
+75,item_wraith_band,Wraith Band
+76,item_recipe_null_talisman,Null Talisman Recipe
+77,item_null_talisman,Null Talisman
+78,item_recipe_mekansm,Mekansm Recipe
+79,item_mekansm,Mekansm
+81,item_vladmir,Vladmir's Offering
+85,item_recipe_buckler,Buckler Recipe
+86,item_buckler,Buckler
+87,item_recipe_ring_of_basilius,Ring of Basilius Recipe
+88,item_ring_of_basilius,Ring of Basilius
+268,item_recipe_holy_locket,Holy Locket Recipe
+269,item_holy_locket,Holy Locket
+89,item_recipe_pipe,Pipe of Insight Recipe
+90,item_pipe,Pipe of Insight
+91,item_recipe_urn_of_shadows,Urn of Shadows Recipe
+92,item_urn_of_shadows,Urn of Shadows
+93,item_recipe_headdress,Headdress Recipe
+94,item_headdress,Headdress
+95,item_recipe_sheepstick,Scythe of Vyse Recipe
+96,item_sheepstick,Scythe of Vyse
+97,item_recipe_orchid,Orchid Malevolence Recipe
+98,item_orchid,Orchid Malevolence
+245,item_recipe_bloodthorn,Bloodthorn Recipe
+250,item_bloodthorn,Bloodthorn
+252,item_echo_sabre,Echo Sabre
+99,item_recipe_cyclone,Eul's Scepter Recipe
+100,item_cyclone,Eul's Scepter of Divinity
+612,item_recipe_wind_waker,Wind Waker Recipe
+610,item_wind_waker,Wind Waker
+233,item_recipe_aether_lens,Aether Lens Recipe
+232,item_aether_lens,Aether Lens
+101,item_recipe_force_staff,Force Staff Recipe
+102,item_force_staff,Force Staff
+262,item_recipe_hurricane_pike,Hurricane Pike Recipe
+263,item_hurricane_pike,Hurricane Pike
+103,item_recipe_dagon,Dagon Recipe
+104,item_dagon,Dagon
+201,item_dagon_2,Dagon
+202,item_dagon_3,Dagon
+203,item_dagon_4,Dagon
+204,item_dagon_5,Dagon
+108,item_ultimate_scepter,Aghanim's Scepter
+270,item_recipe_ultimate_scepter_2,Aghanim's Blessing Recipe
+271,item_ultimate_scepter_2,Aghanim's Blessing
+727,item_ultimate_scepter_roshan,Aghanim's Blessing - Roshan
+609,item_aghanims_shard,Aghanim's Shard
+725,item_aghanims_shard_roshan,Aghanim's Shard - Consumable
+109,item_recipe_refresher,Refresher Orb Recipe
+110,item_refresher,Refresher Orb
+111,item_recipe_assault,Assault Cuirass Recipe
+112,item_assault,Assault Cuirass
+113,item_recipe_heart,Heart of Tarrasque Recipe
+114,item_heart,Heart of Tarrasque
+115,item_recipe_black_king_bar,Black King Bar Recipe
+116,item_black_king_bar,Black King Bar
+117,item_aegis,Aegis of the Immortal
+118,item_recipe_shivas_guard,Shiva's Guard Recipe
+119,item_shivas_guard,Shiva's Guard
+121,item_bloodstone,Bloodstone
+122,item_recipe_sphere,Linken's Sphere Recipe
+123,item_sphere,Linken's Sphere
+221,item_recipe_lotus_orb,Lotus Orb Recipe
+226,item_lotus_orb,Lotus Orb
+222,item_recipe_meteor_hammer,Meteor Hammer Recipe
+223,item_meteor_hammer,Meteor Hammer
+225,item_nullifier,Nullifier
+255,item_recipe_aeon_disk,Aeon Disk Recipe
+256,item_aeon_disk,Aeon Disk
+258,item_recipe_kaya,Kaya Recipe
+259,item_kaya,Kaya
+369,item_trident,Trident
+260,item_refresher_shard,Refresher Shard
+266,item_recipe_spirit_vessel,Spirit Vessel Recipe
+267,item_spirit_vessel,Spirit Vessel
+125,item_vanguard,Vanguard
+243,item_recipe_crimson_guard,Crimson Guard Recipe
+242,item_crimson_guard,Crimson Guard
+126,item_recipe_blade_mail,Blade Mail Recipe
+127,item_blade_mail,Blade Mail
+129,item_soul_booster,Soul Booster
+691,item_recipe_eternal_shroud,Eternal Shroud Recipe
+692,item_eternal_shroud,Eternal Shroud
+133,item_rapier,Divine Rapier
+134,item_recipe_monkey_king_bar,Monkey King Bar Recipe
+135,item_monkey_king_bar,Monkey King Bar
+137,item_radiance,Radiance
+139,item_butterfly,Butterfly
+140,item_recipe_greater_crit,Daedalus Recipe
+141,item_greater_crit,Daedalus
+142,item_recipe_basher,Skull Basher Recipe
+143,item_basher,Skull Basher
+144,item_recipe_bfury,Battle Fury Recipe
+145,item_bfury,Battle Fury
+146,item_recipe_manta,Manta Style Recipe
+147,item_manta,Manta Style
+148,item_recipe_lesser_crit,Crystalys Recipe
+149,item_lesser_crit,Crystalys
+234,item_recipe_dragon_lance,Dragon Lance Recipe
+236,item_dragon_lance,Dragon Lance
+150,item_recipe_armlet,Armlet of Mordiggian Recipe
+151,item_armlet,Armlet of Mordiggian
+152,item_invis_sword,Shadow Blade
+248,item_recipe_silver_edge,Silver Edge Recipe
+249,item_silver_edge,Silver Edge
+154,item_sange_and_yasha,Sange and Yasha
+273,item_kaya_and_sange,Kaya and Sange
+277,item_yasha_and_kaya,Yasha and Kaya
+156,item_satanic,Satanic
+157,item_recipe_mjollnir,Mjollnir Recipe
+158,item_mjollnir,Mjollnir
+159,item_recipe_skadi,Eye of Skadi Recipe
+160,item_skadi,Eye of Skadi
+161,item_recipe_sange,Sange Recipe
+162,item_sange,Sange
+163,item_recipe_helm_of_the_dominator,Helm of the Dominator Recipe
+164,item_helm_of_the_dominator,Helm of the Dominator
+633,item_recipe_helm_of_the_overlord,Helm of the Overlord Recipe
+635,item_helm_of_the_overlord,Helm of the Overlord
+166,item_maelstrom,Maelstrom
+1565,item_recipe_gungir,Gleipnir Recipe
+1466,item_gungir,Gleipnir
+168,item_desolator,Desolator
+169,item_recipe_yasha,Yasha Recipe
+170,item_yasha,Yasha
+172,item_mask_of_madness,Mask of Madness
+173,item_recipe_diffusal_blade,Diffusal Blade Recipe
+174,item_diffusal_blade,Diffusal Blade
+1096,item_recipe_disperser,Disperser Recipe
+1097,item_disperser,Disperser
+175,item_recipe_ethereal_blade,Ethereal Blade Recipe
+176,item_ethereal_blade,Ethereal Blade
+177,item_recipe_soul_ring,Soul Ring Recipe
+178,item_soul_ring,Soul Ring
+179,item_recipe_arcane_boots,Arcane Boots Recipe
+180,item_arcane_boots,Arcane Boots
+235,item_octarine_core,Octarine Core
+181,item_orb_of_venom,Orb of Venom
+240,item_blight_stone,Blight Stone
+569,item_orb_of_corrosion,Orb of Corrosion
+599,item_recipe_falcon_blade,Falcon Blade Recipe
+596,item_falcon_blade,Falcon Blade
+597,item_recipe_mage_slayer,Mage Slayer Recipe
+598,item_mage_slayer,Mage Slayer
+184,item_recipe_ancient_janggo,Drum of Endurance Recipe
+185,item_ancient_janggo,Drum of Endurance
+930,item_recipe_boots_of_bearing,Boots of Bearing Recipe
+931,item_boots_of_bearing,Boots of Bearing
+227,item_recipe_solar_crest,Solar Crest Recipe
+229,item_solar_crest,Solar Crest
+1127,item_recipe_pavise,Pavise Recipe
+1128,item_pavise,Pavise
+188,item_smoke_of_deceit,Smoke of Deceit
+189,item_recipe_veil_of_discord,Veil of Discord Recipe
+190,item_veil_of_discord,Veil of Discord
+910,item_recipe_revenants_brooch,Revenant's Brooch Recipe
+911,item_revenants_brooch,Revenant's Brooch
+1805,item_recipe_devastator,Parasma Recipe
+1806,item_devastator,Parasma
+230,item_recipe_guardian_greaves,Guardian Greaves Recipe
+231,item_guardian_greaves,Guardian Greaves
+205,item_recipe_rod_of_atos,Rod of Atos Recipe
+206,item_rod_of_atos,Rod of Atos
+239,item_iron_talon,Iron Talon
+207,item_recipe_abyssal_blade,Abyssal Blade Recipe
+208,item_abyssal_blade,Abyssal Blade
+209,item_recipe_heavens_halberd,Heaven's Halberd Recipe
+210,item_heavens_halberd,Heaven's Halberd
+212,item_ring_of_aquila,Ring of Aquila
+214,item_tranquil_boots,Tranquil Boots
+215,item_shadow_amulet,Shadow Amulet
+253,item_recipe_glimmer_cape,Glimmer Cape Recipe
+254,item_glimmer_cape,Glimmer Cape
+1028,item_mutation_tombstone,Tombstone
+1029,item_super_blink,Super Blink Dagger
+1030,item_pocket_tower,Pocket Tower
+1032,item_pocket_roshan,Pocket Roshan
+287,item_keen_optic,Keen Optic
+288,item_grove_bow,Grove Bow
+289,item_quickening_charm,Quickening Charm
+290,item_philosophers_stone,Philosopher's Stone
+291,item_force_boots,Force Boots
+292,item_desolator_2,Stygian Desolator
+293,item_phoenix_ash,Phoenix Ash
+294,item_seer_stone,Seer Stone
+295,item_greater_mango,Greater Mango
+302,item_elixer,Elixir
+297,item_vampire_fangs,Vampire Fangs
+829,item_force_field,Arcanist's Armor
+834,item_black_powder_bag,Blast Rig
+849,item_mechanical_arm,Mechanical Arm
+298,item_craggy_coat,Craggy Coat
+299,item_greater_faerie_fire,Greater Faerie Fire
+300,item_timeless_relic,Timeless Relic
+301,item_mirror_shield,Mirror Shield
+303,item_recipe_ironwood_tree,Ironwood Tree Recipe
+304,item_ironwood_tree,Ironwood Tree
+328,item_mango_tree,Mango Tree
+305,item_royal_jelly,Royal Jelly
+306,item_pupils_gift,Pupil's Gift
+307,item_tome_of_aghanim,Tome of Aghanim
+308,item_repair_kit,Repair Kit
+309,item_mind_breaker,Mind Breaker
+310,item_third_eye,Third Eye
+311,item_spell_prism,Spell Prism
+325,item_princes_knife,Prince's Knife
+330,item_witless_shako,Witless Shako
+334,item_imp_claw,Imp Claw
+336,item_spy_gadget,Telescope
+326,item_spider_legs,Spider Legs
+327,item_helm_of_the_undying,Helm of the Undying
+331,item_vambrace,Vambrace
+312,item_horizon,Horizon
+313,item_fusion_rune,Fusion Rune
+354,item_ocean_heart,Ocean Heart
+1124,item_spark_of_courage,Spark of Courage
+355,item_broom_handle,Broom Handle
+356,item_trusty_shovel,Trusty Shovel
+358,item_dragon_scale,Dragon Scale
+359,item_essence_ring,Essence Ring
+360,item_clumsy_net,Clumsy Net
+361,item_enchanted_quiver,Enchanted Quiver
+362,item_ninja_gear,Ninja Gear
+363,item_illusionsts_cape,Illusionist's Cape
+364,item_havoc_hammer,Havoc Hammer
+365,item_panic_button,Magic Lamp
+366,item_apex,Apex
+367,item_ballista,Ballista
+368,item_woodland_striders,Woodland Striders
+275,item_recipe_trident,Trident Recipe
+370,item_demonicon,Book of the Dead
+371,item_fallen_sky,Fallen Sky
+372,item_pirate_hat,Pirate Hat
+373,item_dimensional_doorway,Dimensional Doorway
+374,item_ex_machina,Ex Machina
+375,item_faded_broach,Faded Broach
+376,item_paladin_sword,Paladin Sword
+377,item_minotaur_horn,Minotaur Horn
+378,item_orb_of_destruction,Orb of Destruction
+379,item_the_leveller,The Leveller
+349,item_arcane_ring,Arcane Ring
+381,item_titan_sliver,Titan Sliver
+565,item_chipped_vest,Chipped Vest
+566,item_wizard_glass,Wizard Glass
+570,item_gloves_of_travel,Gloves of Travel
+573,item_elven_tunic,Elven Tunic
+574,item_cloak_of_flames,Cloak of Flames
+575,item_venom_gland,Venom Gland
+571,item_trickster_cloak,Trickster Cloak
+576,item_gladiator_helm,Helm of the Gladiator
+577,item_possessed_mask,Possessed Mask
+578,item_ancient_perseverance,Ancient Perseverance
+637,item_star_mace,Star Mace
+638,item_penta_edged_sword,Penta-Edged Sword
+582,item_oakheart,Oakheart
+674,item_warhammer,Warhammer
+680,item_bullwhip,Bullwhip
+675,item_psychic_headband,Psychic Headband
+676,item_ceremonial_robe,Ceremonial Robe
+686,item_quicksilver_amulet,Quicksilver Amulet
+677,item_book_of_shadows,Book of Shadows
+678,item_giants_ring,Giant's Ring
+679,item_vengeances_shadow,Shadow of Vengeance
+585,item_stormcrafter,Stormcrafter
+588,item_overflowing_elixir,Overflowing Elixir
+589,item_mysterious_hat,Fairy's Trinket
+824,item_assassins_dagger,Assassin's Dagger
+825,item_ascetic_cap,Ascetic's Cap
+826,item_sample_picker,Assassin's Contract
+827,item_icarus_wings,Icarus Wings
+828,item_misericorde,Brigand's Blade
+836,item_light_robes,Light Robes
+837,item_heavy_blade,Witchbane
+838,item_unstable_wand,Pig Pole
+839,item_fortitude_ring,Ring of Fortitude
+840,item_pogo_stick,Tumbler's Toy
+835,item_paintball,Fae Grenade
+945,item_seeds_of_serenity,Seeds of Serenity
+946,item_lance_of_pursuit,Lance of Pursuit
+947,item_occult_bracelet,Occult Bracelet
+948,item_tome_of_omniscience,
+949,item_ogre_seal_totem,Ogre Seal Totem
+940,item_wand_of_the_brine,Wand of the Brine
+938,item_slime_vial,
+1101,item_recipe_harpoon,Harpoon Recipe
+939,item_harpoon,Harpoon
+950,item_defiant_shell,Defiant Shell
+968,item_arcane_scout,
+969,item_barricade,
+990,item_eye_of_the_vizier,Eye of the Vizier
+998,item_manacles_of_power,
+1000,item_bottomless_chalice,
+1017,item_wand_of_sanctitude,
+1076,item_specialists_array,Specialist's Array
+1077,item_dagger_of_ristul,Dagger of Ristul
+4300,item_ofrenda,Beloved Memory
+4301,item_ofrenda_shovel,Scrying Shovel
+4302,item_ofrenda_pledge,Forebearer's Fortune
+1090,item_muertas_gun,Mercy & Grace
+2091,item_tier1_token,Tier 1 Token
+2092,item_tier2_token,Tier 2 Token
+2093,item_tier3_token,Tier 3 Token
+2094,item_tier4_token,Tier 4 Token
+2095,item_tier5_token,Tier 5 Token
+2096,item_vindicators_axe,Vindicator's Axe
+2097,item_duelist_gloves,Duelist Gloves
+1156,item_ancient_guardian,Ancient Guardian
+1157,item_safety_bubble,Safety Bubble
+1158,item_whisper_of_the_dread,Whisper of the Dread
+1159,item_nemesis_curse,Nemesis Curse
+1160,item_avianas_feather,Aviana's Feather
+1161,item_unwavering_condition,Unwavering Condition
+2098,item_horizons_equilibrium,Horizon's Equilibrium
+2099,item_blighted_spirit,Blighted Spirit
+2190,item_dandelion_amulet,Dandelion Amulet
+2191,item_turtle_shell,Turtle Shell
+2192,item_martyrs_plate,Martyr's Plate
+2193,item_gossamer_cape,Gossamer Cape
+1167,item_light_collector,Light Collector
+1168,item_rattlecage,Rattlecage
+1803,item_doubloon,Doubloon
+1804,item_roshans_banner,Roshan's Banner
+1440,item_black_grimoire,Black Grimoire
+1441,item_grisgris,Gris-Gris

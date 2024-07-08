@@ -1,16 +1,14 @@
+`<a id="readme-top"></a>`
 
-<a id="readme-top"></a>
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
-
+[Contributors][contributors-url]
+[Forks][forks-url]
+[Stargazers][stars-url]
+[Issues][issues-url]
+[MIT License][license-url]
+[LinkedIn][linkedin-url]
 
 <!-- PROJECT LOGO -->
+
 <br />
 <div align="center">
   <a href="https://github.com/chasimm3/dota_project">
@@ -19,7 +17,7 @@
 
 <h3 align="center">OpenDota Data Warehouse</h3>
 
-  <p align="center">
+<p align="center">
 An all in one data warehouse utilising the API provided by OpenDota.com. 
     <br />
     <a href="https://github.com/chasimm3/dota_project"><strong>Explore the docs »</strong></a>
@@ -32,9 +30,8 @@ An all in one data warehouse utilising the API provided by OpenDota.com.
   </p>
 </div>
 
-
-
 <!-- TABLE OF CONTENTS -->
+
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -57,9 +54,8 @@ An all in one data warehouse utilising the API provided by OpenDota.com.
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 <br />
@@ -71,34 +67,64 @@ An all in one data warehouse utilising the API provided by OpenDota.com.
 
 An example of the data structure within the Matches fact table.
 
-
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
-TO DO
+When executed, the script will execute some GET API calls against the OpenDota API. It will stage the json data in a series of staging folders, then transform the data into a Kimball dimensional model. 
+
+Currently there are 3 dimensions and 1 fact table in the model, this are Dim_Player, Dim_Item, Dim_Hero, and Fact_Matches. Dim_Hero and Dim_Item currently 
+
+
+
+
+To get started with this repository, start by cloning the repo onto your machine. From there the code can be executed immediately with default configuration, which is as follows:
+
+**Staging Folder** 
+
+The file path of config.py appended with Staging/.
+
+**Tables Folder**
+
+The file path of config.py appended with Tables/
+
+**Output file type**
+
+The default file type is xlsx.
+
+**Output into single excel file**
+
+The default is set to true.
+
 
 ### Prerequisites
 
+A basic knowledge of running python code, including change parameters before execution. This is best done in an IDE such as VSCode. 
+
 Ensure that you have pip installed and are upgraded to the latest version.
-  ##### Windows:
-  ```py
+
+##### Windows:
+
+```py
   py -m ensurepip --upgrade
-  ```
-  
-  ##### Linux:  
-  ```py
+```
+
+##### Linux:
+
+```py
   python -m ensurepip --upgrade
-  ```
-  
-  ##### MacOS
-  ```py
+```
+
+##### MacOS
+
+```py
   python -m ensurepip --upgrade
-  ```
+```
 
 ### Installation
 
-UNFINISHED: 
+UNFINISHED:
+
 1. 
 2. Clone the repo
    ```sh
@@ -107,12 +133,11 @@ UNFINISHED:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
-The primary use of this project should be for data analysis of trends of professional dota players. The data can be connected to any data analysis tool (e.g. PowerBi, Jupyter etc) to enable in-depth analysis of the hero choice and item choice impact upon win probability. 
+The primary use of this project should be for data analysis of trends of professional dota players. The data can be connected to any data analysis tool (e.g. PowerBi, Jupyter etc) to enable in-depth analysis of the hero choice and item choice impact upon win probability.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
@@ -120,32 +145,30 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## API Usage Limits
 
-As the code utilises the free API provided by OpenDota.com, it is as such limited to: 
+As the code utilises the free API provided by OpenDota.com, it is as such limited to:
 
-   - 60 requests per min
-   - 2,000 requests per day
-   
+- 60 requests per min
+- 2,000 requests per day
+
 There are currently no plans to include a premium option, if you would like this functionality added feel free to raise a feature-request at: https://github.com/chasimm3/dota_project/issues/new?labels=enhancement&template=feature-request---.md
 
-
-
 <!-- ROADMAP -->
+
 ## Roadmap
 
-- [ ] Enable choice of output file type, currently the only available structure is .csv. 
-	- [ ] Parquet
-	- [ ] Json
-	- [ ] xlsx
-- [ ] Import additional data from the API, including in-depth match stats. 
+- [ ] Enable choice of output file type, currently the only available structure is .csv.
+  - [X] Parquet
+  - [ ] Json
+  - [X] xlsx
+- [ ] Import additional data from the API, including in-depth match stats.
 - [ ] Build up a suite of PowerBI reports to get the ball rolling for the users.
 
 See the [open issues](https://github.com/chasimm3/dota_project/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -161,18 +184,16 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- CONTACT -->
+
 ## Contact
 
 Charlie Simmons - charlie.simmons92@gmail.com.com
@@ -181,19 +202,18 @@ Project Link: [https://github.com/chasimm3/dota_project](https://github.com/chas
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- ACKNOWLEDGMENTS -->
+
 ## Acknowledgments
 
 * []() OpenDota for providing a free to use API.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
+
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/chasimm3/dota_project.svg?style=for-the-badge
 [contributors-url]: https://github.com/chasimm3/dota_project/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/chasimm3/dota_project.svg?style=for-the-badge

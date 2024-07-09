@@ -1,4 +1,4 @@
-<a id="readme-top"></a>
+`<a id="readme-top"></a>`
 
 [Contributors][contributors-url] [Forks][forks-url] [Stargazers][stars-url] [Issues][issues-url] [MIT License][license-url] [LinkedIn][linkedin-url]
 
@@ -157,7 +157,6 @@ Ensure that you have pip installed and are upgraded to the latest version.
 
 The primary use of this project is for data analysis of trends of professional Dota players. The data can be connected to any data analysis tool (e.g. PowerBi, Jupyter etc) to enable in-depth analysis of the hero choice upon win probability.
 
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## API Usage Limits
@@ -179,7 +178,7 @@ There are currently no plans to include a premium option, if you would like this
   - [X] xlsx
 - [ ] Import additional data from the API, including in-depth match stats.
 - [ ] Build up a suite of PowerBI reports to get the ball rolling for the users.
-- [ ] Update Fact_Matches to pull from all staging files rather than the latest only.
+- [X] Update Fact_Matches to pull from all staging files rather than the latest only.
 
 See the [open issues](https://github.com/chasimm3/dota_project/issues) for a full list of proposed features (and known issues).
 
@@ -224,15 +223,14 @@ Project Link: [https://github.com/chasimm3/dota_project](https://github.com/chas
 ## Acknowledgments
 
 * OpenDota for providing a free to use API.
-
 * othneildrew for their indepth README examples and templates on GitHub: [https://github.com/othneildrew/Best-README-Template](https://github.com/othneildrew/Best-README-Template)
-  
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/chasimm3/dota_project.svg?style=for-the-badge
 [contributors-url]: https://github.com/chasimm3/dota_project/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/chasimm3/dota_project.svg?style=for-the-badge

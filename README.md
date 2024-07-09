@@ -1,11 +1,6 @@
-`<a id="readme-top"></a>`
+<a id="readme-top"></a>
 
-[Contributors][contributors-url]
-[Forks][forks-url]
-[Stargazers][stars-url]
-[Issues][issues-url]
-[MIT License][license-url]
-[LinkedIn][linkedin-url]
+[![Contributors][contributors-shield]][contributors-url] [![Forks][forks-shield]][forks-url] [![Stargazers][stars-shield]][stars-url] [![Issues][issues-shield]][issues-url] [![MIT License][license-shield]][license-url] [![LinkedIn][linkedin-shield]][linkedin-url] 
 
 <!-- PROJECT LOGO -->
 
@@ -221,5 +216,7 @@ Project Link: [https://github.com/chasimm3/dota_project](https://github.com/chas
 [license-shield]: https://img.shields.io/github/license/chasimm3/dota_project.svg?style=for-the-badge
 [license-url]: https://github.com/chasimm3/dota_project/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://www.linkedin.com/in/charlie-simmons-25a25599/
+[linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
+
+

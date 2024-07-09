@@ -157,7 +157,6 @@ Ensure that you have pip installed and are upgraded to the latest version.
 
 The primary use of this project is for data analysis of trends of professional Dota players. The data can be connected to any data analysis tool (e.g. PowerBi, Jupyter etc) to enable in-depth analysis of the hero choice upon win probability.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -245,5 +244,5 @@ Project Link: [https://github.com/chasimm3/dota_project](https://github.com/chas
 [license-shield]: https://img.shields.io/github/license/chasimm3/dota_project.svg?style=for-the-badge
 [license-url]: https://github.com/chasimm3/dota_project/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
+[linkedin-url]: https://linkedin.com/in/charlie-simmons-25a25599/
 [product-screenshot]: images/screenshot.png

@@ -1,4 +1,4 @@
-`<a id="readme-top"></a>`
+<a id="readme-top"></a>
 
 [Contributors][contributors-url] [Forks][forks-url] [Stargazers][stars-url] [Issues][issues-url] [MIT License][license-url] [LinkedIn][linkedin-url]
 
@@ -234,7 +234,6 @@ Project Link: [https://github.com/chasimm3/dota_project](https://github.com/chas
 <!-- MARKDOWN LINKS & IMAGES -->
 
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
 [contributors-shield]: https://img.shields.io/github/contributors/chasimm3/dota_project.svg?style=for-the-badge
 [contributors-url]: https://github.com/chasimm3/dota_project/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/chasimm3/dota_project.svg?style=for-the-badge

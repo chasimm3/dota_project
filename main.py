@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
+from time import strftime, localtime
 from dateutil import parser
 from pathlib import Path
 import json
@@ -9,6 +10,7 @@ import os
 import time
 from support import get_value_by_column, load_json_to_file, create_folder, load_csv, load_parquet, load_excel
 import config
+
 
 
 class OpenDota():
@@ -70,10 +72,10 @@ class OpenDota():
                 date_difference = current_date - last_match_time
                 if (date_difference < timedelta(hours=5)):# and player_name == 'SaberLight':
                     
-                    print('Loading from URL: ' + row['recent_matches_url'] + '' + str(account_id))
+                    print('Loading from URL: ' + row['recent_matches_url'] + '' + str(account_id) + '_' + str(self.date1) + '.json')
                     self.matches = requests.get(row['recent_matches_url']).json()
 
-                    with open(output_folder + str(account_id) + '.json', "w") as f:
+                    with open(output_folder + str(account_id) + '_' + str(self.date1) + '.json', "w") as f:
                         json.dump(self.matches, f, ensure_ascii=False, indent=4)            
                     time.sleep(1)         
         
@@ -118,8 +120,11 @@ class OpenDota():
         matches_file_path = self.staging_folder + 'recent_matches/'
         output_file_path = self.tables_folder + 'fact_matches'
         
-        list_of_files = []
+        li = []
         
+        ## aiming to remove
+        
+        list_of_files = []
         # only get files that are loaded today:
         for filename in os.listdir(matches_file_path):
             file_path = os.path.join(matches_file_path, filename)
@@ -129,8 +134,40 @@ class OpenDota():
                 create_time = os.path.getctime(file_path)
                 creation_date = datetime.fromtimestamp(create_time).date()
                 
-                if creation_date == datetime.now().date():
-                    list_of_files.append(file_path)
+                # if creation_date == datetime.now().date():
+                list_of_files.append(file_path)
+        
+        
+        # # get list of all files in staging folder
+        # all_files = glob.glob(os.path.join(matches_file_path , "*.json"))
+        
+        
+        # for filename in all_files:
+        #     with open(filename, "r") as json_file:
+        #         # for each file in list, load and normalize the json
+        #         match_data = json.load(json_file)
+        #         df_match = pd.json_normalize(match_data)
+                
+        #         # get the account_id from the file name and append as new column in dataframe
+        #         u = (((filename[::-1])[:((filename[::-1]).find('_'))])[::-1]).replace('.json', '')
+        #         df_match['account_id'] = u
+        #         # get file create date from source file and append to new column in dataframe
+        #         create_time = strftime('%Y-%m-%d %H:%M:%S', localtime(os.path.getctime(filename)))
+        #         df_match['load_date'] = create_time
+        #         li.append(df_match)
+        
+        # # concat list of data to dataframe
+        # df_all = pd.concat(li, axis=0, ignore_index=True)
+        
+        # # pull load date and natural keys into a new dataframe
+        # df_load_date = df_all[['load_date', 'match_id', 'account_id']].copy()
+        
+        # # drop the load_date colum and drop the duplicates from the main dataframe
+        # df_all = df_all.iloc[:,:-1].drop_duplicates()
+        
+        # # merge the main dataframe into the load_date dataframe to pull load_date back in
+        # df_new = pd.merge(df_all, df_load_date, left_on=['match_id', 'account_id'], right_on=['match_id', 'account_id'])
+
 
         # initialise dataframe
         df = pd.DataFrame()
@@ -175,29 +212,24 @@ class OpenDota():
                 # append json array items to dataframe
                 df2 = pd.json_normalize(match_data)
                 
-                # get account_id from the file name and add it as an additional columns
-                # -> reverse the path 
-                # -> within the reverse of the path find the location of the first _ 
-                # -> take everything to the left of the first underscore 
-                # -> reverse it back
-                # -> replace .json with nothing
+                # get date from the file by reversing the string and getting the characters up until the first underscore
+                date = (((i[::-1])[:((i[::-1]).find('_'))])[::-1]).replace('.json', '')
+                # from the file name, get the string up until the location of the date 
+                j = i[0:i.find(date)-1]
+                # get the account id from the file name by reversing the string and getthing the characters up until the first underscore now that date has been removed
+                account_id = (((j[::-1])[:((j[::-1]).find('_'))])[::-1]).replace('.json', '')
                 
-                u = (((i[::-1])[:((i[::-1]).find('_'))])[::-1]).replace('.json', '')
-                
-                df2['account_id'] = u
+                df2['account_id'] = account_id
                 
                 # get the dim_player_id for the account id
-                df2['fk_dim_player_id'] = get_value_by_column(df_players, 'account_id', int(u), 'dim_player_id')
+                df2['fk_dim_player_id'] = get_value_by_column(df_players, 'account_id', int(account_id), 'dim_player_id')
                 
-                # df2['fk_dim_hero_id'] = get_value_by_column(df_hero, ''
+                df2['load_date'] = date
                 
                 df = pd.concat([df2, df])
 
         # merge dataframe to hero dimension and pull in dim_hero_id to a new column, fk_dim_hero_id
         df = df.merge(df_hero[['dim_hero_id', 'id']],  left_on='hero_id', right_on='id', how='left').rename(columns={'dim_hero_id':'fk_dim_hero_id'}).drop(columns='id')   
-        
-        current_date = datetime.now()
-        df['load_date'] = pd.Timestamp(current_date)
         
         # save dataframe to csv file
         if self.output_file_type == 'csv':
@@ -319,20 +351,20 @@ create_folder(config.tables_folder)
 open_dota = OpenDota(config.staging_folder, config.tables_folder, config.date1, config.output_file_type)
 
 # # stage all data
-open_dota.load_parent('heroes', 'heroes/heroes_')
-open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
-open_dota.load_parent('constants/items', 'constants/items/items_')
-open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
-open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
-open_dota.load_matches() # takes fucking ages
+# open_dota.load_parent('heroes', 'heroes/heroes_')
+# open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
+# open_dota.load_parent('constants/items', 'constants/items/items_')
+# open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
+# open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
+# open_dota.load_matches() # takes fucking ages
 
 # build dim_items
 open_dota.transform_items('reference/')
 # build dim_player
 open_dota.transform_dimension(config.staging_folder + 'pro_players/', config.tables_folder + 'dim_player', 'dim_player', config.output_file_excel_single_file)
-# # build dim_hero
+# build dim_hero
 open_dota.transform_dimension(config.staging_folder + 'heroes/', config.tables_folder + 'dim_hero', 'dim_hero', config.output_file_excel_single_file)
-# # transform matches
+# transform matches
 open_dota.transform_matches()
 
 

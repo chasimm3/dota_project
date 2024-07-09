@@ -138,37 +138,6 @@ class OpenDota():
                 list_of_files.append(file_path)
         
         
-        # # get list of all files in staging folder
-        # all_files = glob.glob(os.path.join(matches_file_path , "*.json"))
-        
-        
-        # for filename in all_files:
-        #     with open(filename, "r") as json_file:
-        #         # for each file in list, load and normalize the json
-        #         match_data = json.load(json_file)
-        #         df_match = pd.json_normalize(match_data)
-                
-        #         # get the account_id from the file name and append as new column in dataframe
-        #         u = (((filename[::-1])[:((filename[::-1]).find('_'))])[::-1]).replace('.json', '')
-        #         df_match['account_id'] = u
-        #         # get file create date from source file and append to new column in dataframe
-        #         create_time = strftime('%Y-%m-%d %H:%M:%S', localtime(os.path.getctime(filename)))
-        #         df_match['load_date'] = create_time
-        #         li.append(df_match)
-        
-        # # concat list of data to dataframe
-        # df_all = pd.concat(li, axis=0, ignore_index=True)
-        
-        # # pull load date and natural keys into a new dataframe
-        # df_load_date = df_all[['load_date', 'match_id', 'account_id']].copy()
-        
-        # # drop the load_date colum and drop the duplicates from the main dataframe
-        # df_all = df_all.iloc[:,:-1].drop_duplicates()
-        
-        # # merge the main dataframe into the load_date dataframe to pull load_date back in
-        # df_new = pd.merge(df_all, df_load_date, left_on=['match_id', 'account_id'], right_on=['match_id', 'account_id'])
-
-
         # initialise dataframe
         df = pd.DataFrame()
         
@@ -351,12 +320,12 @@ create_folder(config.tables_folder)
 open_dota = OpenDota(config.staging_folder, config.tables_folder, config.date1, config.output_file_type)
 
 # # stage all data
-# open_dota.load_parent('heroes', 'heroes/heroes_')
-# open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
-# open_dota.load_parent('constants/items', 'constants/items/items_')
-# open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
-# open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
-# open_dota.load_matches() # takes fucking ages
+open_dota.load_parent('heroes', 'heroes/heroes_')
+open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
+open_dota.load_parent('constants/items', 'constants/items/items_')
+open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
+open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
+open_dota.load_matches() # takes fucking ages
 
 # build dim_items
 open_dota.transform_items('reference/')

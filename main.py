@@ -1,26 +1,33 @@
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
+from time import strftime, localtime
 from dateutil import parser
+from pathlib import Path
 import json
 import glob
 import os
 import time
-from support import get_value_by_column, load_json_to_file, create_folder
+from support import get_value_by_column, load_json_to_file, create_folder, load_csv, load_parquet, load_excel
+import config
+
 
 
 class OpenDota():
-    def __init__(self, staging_folder, tables_folder, date1):
+    def __init__(self, staging_folder, tables_folder, date1, output_file_type):
         
         # initialise variables
         self.base_url = 'https://api.opendota.com/api/'
         self.staging_folder = staging_folder
         self.tables_folder = tables_folder
+        self.output_file_type = output_file_type
+        self.date1 = date1
+        
     
     def load_parent(self, url_x, folder):
         # initialize variables
         url = self.base_url + url_x
-        file_path = self.staging_folder + folder + date1 + '.json'
+        file_path = self.staging_folder + folder + self.date1 + '.json'
         
         # send api request to url
         response = requests.get(url)
@@ -37,7 +44,7 @@ class OpenDota():
     def load_matches(self):
         output_file = 'recent_matches_'
         output_folder = self.staging_folder + 'recent_matches/' + output_file
-        players_file_path = self.staging_folder + 'pro_players/pro_players_' + date1 +'.json'
+        players_file_path = self.staging_folder + 'pro_players/pro_players_' + self.date1 +'.json'
         
         # open the players file
         with open(players_file_path, "r") as json_file:
@@ -65,14 +72,16 @@ class OpenDota():
                 date_difference = current_date - last_match_time
                 if (date_difference < timedelta(hours=5)):# and player_name == 'SaberLight':
                     
-                    print('Loading from URL: ' + row['recent_matches_url'] + '' + str(account_id))
+                    print('Loading from URL: ' + row['recent_matches_url'] + '' + str(account_id) + '_' + str(self.date1) + '.json')
                     self.matches = requests.get(row['recent_matches_url']).json()
 
-                    with open(output_folder + str(account_id) + '.json', "w") as f:
+                    with open(output_folder + str(account_id) + '_' + str(self.date1) + '.json', "w") as f:
                         json.dump(self.matches, f, ensure_ascii=False, indent=4)            
                     time.sleep(1)         
         
-    def transform_dimension(self, file_path, output_file_path, pk_name):
+    def transform_dimension(self, file_path, output_file_path, dimension_name, output_file_excel_single_file):
+        
+        pk_name = dimension_name + '_id'
         
         list_of_files = glob.glob(file_path + '*') # * means all, if need specific format then *.csv
         latest_file = max(list_of_files, key=os.path.getctime)
@@ -92,19 +101,30 @@ class OpenDota():
         # insert incremental integer in column 1 
         df.insert(0, pk_name, range(1, 1 + len(df)))
         
-        # load to csv, not including the index (I know I just reset it, it was for testing purposes)
-        df.to_csv(output_file_path, index=False, sep='|')
+        # load dataframe to file,
+        if self.output_file_type == 'csv':
+            load_csv(df, output_file_path + '.csv', '|')
+        if self.output_file_type == 'parquet':
+            load_parquet(df, output_file_path + '.parquet.gzip')
+        if self.output_file_type == 'xlsx' and output_file_excel_single_file == False: 
+            load_excel(df, output_file_path, dimension_name, False)
+        if self.output_file_type == 'xlsx' and output_file_excel_single_file == True:
+            load_excel(df, 'Tables/single_file', dimension_name, True)    
+
         
-        print('Player Transformation Complete: ' + output_file_path + ' created.')
+        print('Player Transformation Complete: ' + output_file_path + '.' + self.output_file_type + ' created.')
         
         
     def transform_matches(self):
         
         matches_file_path = self.staging_folder + 'recent_matches/'
-        output_file = self.tables_folder + 'fact_matches.csv'
+        output_file_path = self.tables_folder + 'fact_matches'
+        
+        li = []
+        
+        ## aiming to remove
         
         list_of_files = []
-        
         # only get files that are loaded today:
         for filename in os.listdir(matches_file_path):
             file_path = os.path.join(matches_file_path, filename)
@@ -114,19 +134,75 @@ class OpenDota():
                 create_time = os.path.getctime(file_path)
                 creation_date = datetime.fromtimestamp(create_time).date()
                 
-                if creation_date == datetime.now().date():
-                    list_of_files.append(file_path)
-
-
-        # list all files in folder
-        # list_of_files = glob.glob(matches_file_path + '*')      
+                # if creation_date == datetime.now().date():
+                list_of_files.append(file_path)
         
+        
+        # # get list of all files in staging folder
+        # all_files = glob.glob(os.path.join(matches_file_path , "*.json"))
+        
+        
+        # for filename in all_files:
+        #     with open(filename, "r") as json_file:
+        #         # for each file in list, load and normalize the json
+        #         match_data = json.load(json_file)
+        #         df_match = pd.json_normalize(match_data)
+                
+        #         # get the account_id from the file name and append as new column in dataframe
+        #         u = (((filename[::-1])[:((filename[::-1]).find('_'))])[::-1]).replace('.json', '')
+        #         df_match['account_id'] = u
+        #         # get file create date from source file and append to new column in dataframe
+        #         create_time = strftime('%Y-%m-%d %H:%M:%S', localtime(os.path.getctime(filename)))
+        #         df_match['load_date'] = create_time
+        #         li.append(df_match)
+        
+        # # concat list of data to dataframe
+        # df_all = pd.concat(li, axis=0, ignore_index=True)
+        
+        # # pull load date and natural keys into a new dataframe
+        # df_load_date = df_all[['load_date', 'match_id', 'account_id']].copy()
+        
+        # # drop the load_date colum and drop the duplicates from the main dataframe
+        # df_all = df_all.iloc[:,:-1].drop_duplicates()
+        
+        # # merge the main dataframe into the load_date dataframe to pull load_date back in
+        # df_new = pd.merge(df_all, df_load_date, left_on=['match_id', 'account_id'], right_on=['match_id', 'account_id'])
+
+
+        # initialise dataframe
         df = pd.DataFrame()
         
-        # load players csv file to dataframe            
-        players_file = self.tables_folder + 'dim_players.csv'
+        
+        # load players csv file to dataframe using support functions depending on output type
         df_players = pd.DataFrame()
-        df_players = pd.read_csv(players_file, header='infer', sep='|')
+        if self.output_file_type ==  'csv':
+            players_file = self.tables_folder + 'dim_player.csv'
+            df_players = pd.read_csv(players_file, header='infer', sep='|')
+        if self.output_file_type == 'parquet':
+            players_file = self.tables_folder + 'dim_player.parquet.gzip'
+            df_players = pd.read_parquet(players_file)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False:
+            players_file = self.tables_folder + 'dim_player.xlsx'
+            df_players = pd.read_excel(players_file)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
+            players_file = self.tables_folder + 'single_file.xlsx'
+            df_players = pd.read_excel(players_file, sheet_name='dim_player')
+
+        # load players csv file to dataframe using support functions depending on output type
+        df_hero = pd.DataFrame()
+        if self.output_file_type ==  'csv':
+            hero_file = self.tables_folder + 'dim_hero.csv'
+            df_hero = pd.read_csv(players_file, header='infer', sep='|')
+        if self.output_file_type == 'parquet':
+            hero_file = self.tables_folder + 'dim_hero.parquet.gzip'
+            df_hero = pd.read_parquet(players_file)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False:
+            hero_file = self.tables_folder + 'dim_hero.xlsx'
+            df_hero = pd.read_excel(players_file)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
+            hero_file = self.tables_folder + 'single_file.xlsx'
+            df_hero = pd.read_excel(players_file, sheet_name='dim_hero')
+           
         
         # loop through json files in staging folder
         for i in list_of_files:
@@ -136,34 +212,43 @@ class OpenDota():
                 # append json array items to dataframe
                 df2 = pd.json_normalize(match_data)
                 
-                # get account_id from the file name and add it as an additional columns
-                # -> reverse the path 
-                # -> within the reverse of the path find the location of the first _ 
-                # -> take everything to the left of the first underscore 
-                # -> reverse it back
-                # -> replace .json with nothing
+                # get date from the file by reversing the string and getting the characters up until the first underscore
+                date = (((i[::-1])[:((i[::-1]).find('_'))])[::-1]).replace('.json', '')
+                # from the file name, get the string up until the location of the date 
+                j = i[0:i.find(date)-1]
+                # get the account id from the file name by reversing the string and getthing the characters up until the first underscore now that date has been removed
+                account_id = (((j[::-1])[:((j[::-1]).find('_'))])[::-1]).replace('.json', '')
                 
-                u = (((i[::-1])[:((i[::-1]).find('_'))])[::-1]).replace('.json', '')
-                
-                df2['account_id'] = u
+                df2['account_id'] = account_id
                 
                 # get the dim_player_id for the account id
-                df2['fk_dim_player_id'] = get_value_by_column(df_players, 'account_id', int(u), 'dim_player_id')
+                df2['fk_dim_player_id'] = get_value_by_column(df_players, 'account_id', int(account_id), 'dim_player_id')
+                
+                df2['load_date'] = date
                 
                 df = pd.concat([df2, df])
 
-        current_date = datetime.now()
-        df['load_date'] = pd.Timestamp(current_date)
+        # merge dataframe to hero dimension and pull in dim_hero_id to a new column, fk_dim_hero_id
+        df = df.merge(df_hero[['dim_hero_id', 'id']],  left_on='hero_id', right_on='id', how='left').rename(columns={'dim_hero_id':'fk_dim_hero_id'}).drop(columns='id')   
         
         # save dataframe to csv file
-        df.to_csv(output_file, index=False)
+        if self.output_file_type == 'csv':
+            load_csv(df, output_file_path + '.csv', '|')
+        if self.output_file_type == 'parquet':
+            load_parquet(df, output_file_path + '.parquet.gzip')
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False: 
+            load_excel(df, output_file_path, 'fact_matches', False)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
+            load_excel(df, 'Tables/single_file', 'fact_matches', True)    
+                
         
-        print('Match Transformation Complete: ' + output_file + ' created.')
+        print('Match Transformation Complete: ' + output_file_path + ' created.')
         
     def transform_items(self, reference_folder):
         items_file_path = self.staging_folder + 'constants/items/'
-        output_file_path = self.tables_folder + 'dim_items.csv'    
+        # output_file_path = self.tables_folder + 'dim_items.csv'    
         live_items_file_path = self.staging_folder + reference_folder + 'items_live.csv'
+        output_file_path = self.tables_folder + 'dim_item'
         
         # establish dataframe of live items
         df_live_items = pd.read_csv(live_items_file_path)
@@ -235,59 +320,53 @@ class OpenDota():
         # insert incremental integer in column 1 
         df_merged.insert(0, 'dim_item_id', range(1, 1 + len(df_merged)))
         
-        # write to csv
-        df_merged.to_csv(output_file_path, index=False, sep='|')
         
-        print('Item Transformation Complete: ' + output_file_path + ' created.')
+        # save dataframe to specified output file type
+        if self.output_file_type == 'csv':
+            load_csv(df_merged, output_file_path + '.csv', '|')
+        if self.output_file_type == 'parquet':
+            # convert non-parquet function columns to str
+            df_merged = df_merged.astype(str)
+            load_parquet(df_merged, output_file_path + '.parquet.gzip')
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == False: 
+            load_excel(df_merged, output_file_path, 'dim_item', False)
+        if self.output_file_type == 'xlsx' and config.output_file_excel_single_file == True:
+            load_excel(df_merged, 'Tables/single_file', 'dim_item', True)    
         
+        print('Item Transformation Complete: ' + output_file_path + '.' + config.output_file_type + ' created.')
 
-        
-# Function to add apostrophes
-def add_apostrophes(s):
-    return f"'{s}'"               
-            
-# Get the file path of the python script
-base_file_path = os.path.dirname(__file__).replace('\\','/') + '/'
 
-print('Base File Path: ' + base_file_path) 
-
-# declare variables
-staging_folder = base_file_path + 'Staging/'
-tables_folder = base_file_path + 'Tables/'
-base_url = 'https://api.opendota.com/api/'
-player_file_prefix = 'players_sorted_by_country'
-
-# get today's date
-date1 = datetime.today().strftime('%Y%m%d')  # use ('%Y%m%d') when live so that it only loads once per day
 
 # create folders if they don't exist
-create_folder(staging_folder + 'pro_players/')
-create_folder(staging_folder + 'recent_matches/')
-create_folder(staging_folder + 'heroes/')
-create_folder(staging_folder + 'constants/items/')
-create_folder(staging_folder + 'constants/item_ids/')
-create_folder(staging_folder + 'constants/patchnotes/')
-create_folder(staging_folder + 'reference/')
-create_folder(tables_folder)
+create_folder(config.staging_folder + 'pro_players/')
+create_folder(config.staging_folder + 'recent_matches/')
+create_folder(config.staging_folder + 'heroes/')
+create_folder(config.staging_folder + 'constants/items/')
+create_folder(config.staging_folder + 'constants/item_ids/')
+create_folder(config.staging_folder + 'constants/patchnotes/')
+create_folder(config.staging_folder + 'reference/')
+create_folder(config.tables_folder)
 
 # initialise class
-open_dota = OpenDota(staging_folder, tables_folder, date1)
+open_dota = OpenDota(config.staging_folder, config.tables_folder, config.date1, config.output_file_type)
 
 # # stage all data
-open_dota.load_parent('heroes', 'heroes/heroes_')
-open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
-open_dota.load_parent('constants/items', 'constants/items/items_')
-open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
-open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
-open_dota.load_matches() # takes fucking ages
+# open_dota.load_parent('heroes', 'heroes/heroes_')
+# open_dota.load_parent('proPlayers', 'pro_players/pro_players_')
+# open_dota.load_parent('constants/items', 'constants/items/items_')
+# open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
+# open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
+# open_dota.load_matches() # takes fucking ages
 
 # build dim_items
 open_dota.transform_items('reference/')
 # build dim_player
-open_dota.transform_dimension(staging_folder + 'pro_players/', tables_folder + 'dim_players.csv', 'dim_player_id')
+open_dota.transform_dimension(config.staging_folder + 'pro_players/', config.tables_folder + 'dim_player', 'dim_player', config.output_file_excel_single_file)
 # build dim_hero
-open_dota.transform_dimension(staging_folder + 'heroes/', tables_folder + 'dim_heroes.csv', 'dim_hero_id')
+open_dota.transform_dimension(config.staging_folder + 'heroes/', config.tables_folder + 'dim_hero', 'dim_hero', config.output_file_excel_single_file)
 # transform matches
 open_dota.transform_matches()
+
+
 
 

@@ -340,13 +340,13 @@ open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_'
 open_dota.load_matches() # takes fucking ages
 
 # # build dim_items
-# open_dota.transform_items('reference/')
-# # build dim_player
-# open_dota.transform_dimension(config.staging_folder + 'pro_players/', config.tables_folder + 'dim_player', 'dim_player', config.output_file_excel_single_file)
-# # build dim_hero
-# open_dota.transform_dimension(config.staging_folder + 'heroes/', config.tables_folder + 'dim_hero', 'dim_hero', config.output_file_excel_single_file)
-# # transform matches
-# open_dota.transform_matches()
+open_dota.transform_items('reference/')
+# build dim_player
+open_dota.transform_dimension(config.staging_folder + 'pro_players/', config.tables_folder + 'dim_player', 'dim_player', config.output_file_excel_single_file)
+# build dim_hero
+open_dota.transform_dimension(config.staging_folder + 'heroes/', config.tables_folder + 'dim_hero', 'dim_hero', config.output_file_excel_single_file)
+# transform matches
+open_dota.transform_matches()
 
 
 

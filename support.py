@@ -84,3 +84,26 @@ def load_excel(dataframe, file_name, sheet_name, single_file):
                     dataframe.to_excel(writer, sheet_name=sheet_name, index=False)
     except Exception as error:
         print(repr(error))    
+        
+
+
+
+def write_metadata_json(filename, type, new_data):
+    # open file
+    with open(filename, 'r+') as file:
+        file_data = json.load(file)
+
+        try:
+        # append to array
+            file_data[0][type].append(new_data)
+        except:
+            file_data[0][type] = []
+            file_data[0][type].append(new_data)
+        
+        # set the file's current position at offset
+        file.seek(0)
+        
+        # convert file back to json
+        json.dump(file_data, file, indent=4)
+
+    

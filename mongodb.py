@@ -31,7 +31,11 @@ def load_folder(col_name, folder_path):
         with open(filename) as f:
             file_data = json.load(f)
         load_file(col_name, file_data)
-     
 
+
+load_folder("__heroes", base_file_path + 'heroes/')
+load_folder("__items", base_file_path + 'constants/items/')
+load_folder("__item_ids", base_file_path + 'constants/item_ids/')
+load_folder("__patchnotes", base_file_path + 'constants/patchnotes/')
 load_folder("__players", base_file_path + 'pro_players/')
 load_folder('__recent_matches', base_file_path + 'recent_matches/')

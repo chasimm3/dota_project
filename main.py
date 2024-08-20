@@ -8,7 +8,7 @@ import json
 import glob
 import os
 import time
-from support import get_value_by_column, load_json_to_file, create_folder, load_csv, load_parquet, load_excel
+from support import get_value_by_column, load_json_to_file, create_folder, load_csv, load_parquet, load_excel, write_metadata_json
 import config
 
 
@@ -37,9 +37,17 @@ class OpenDota():
 
         # load json to file path
         load_json_to_file(new_data, file_path, 'w')
+        
+        # write load log data to file
+        load_log_data = ({'filename': folder + self.date1 + '.json'
+                          , 'filepath': file_path
+                          , 'load_date': config.date2})
+        write_metadata_json(config.load_log, url_x, load_log_data)
     
         print("New file created: " + str(file_path))
-       
+        
+      # new_data = ({'filename': 'pro_players_20240814.json', 'staging_path': 'staging/pro_players/pro_players_20240814.json', 'load_date': config.date2})
+ 
             
     def load_matches(self):
         output_file = 'recent_matches_'
@@ -78,6 +86,13 @@ class OpenDota():
                     with open(output_folder + str(account_id) + '_' + str(self.date1) + '.json', "w") as f:
                         json.dump(self.matches, f, ensure_ascii=False, indent=4)            
                     time.sleep(1)         
+                    
+                                
+                    # write load log data to file
+                    load_log_data = ({'filename': output_file + str(account_id) + '_' + str(self.date1) + '.json'
+                                      , 'filepath': output_folder  + str(account_id) + '_' + str(self.date1) + '.json'
+                                      , 'load_date': config.date2})
+                    write_metadata_json(config.load_log, 'recent_matches', load_log_data)
         
     def transform_dimension(self, file_path, output_file_path, dimension_name, output_file_excel_single_file):
         
@@ -324,7 +339,7 @@ open_dota.load_parent('constants/item_ids', 'constants/item_ids/item_ids_')
 open_dota.load_parent('constants/patchnotes', 'constants/patchnotes/patchnotes_')
 open_dota.load_matches() # takes fucking ages
 
-# build dim_items
+# # build dim_items
 open_dota.transform_items('reference/')
 # build dim_player
 open_dota.transform_dimension(config.staging_folder + 'pro_players/', config.tables_folder + 'dim_player', 'dim_player', config.output_file_excel_single_file)
